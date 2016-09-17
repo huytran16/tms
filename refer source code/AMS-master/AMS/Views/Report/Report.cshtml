@@ -1,0 +1,226 @@
+﻿@using AMS.Controllers;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Management/__ManagementLayout.cshtml";
+    List<User> listUser = new List<User>();
+    listUser = ViewBag.ListUser;
+    List<Post> listPosts = new List<Post>();
+    listPosts = ViewBag.ListPost;
+    List<int> listCountReport = ViewBag.CountReport;
+    List<Report> listReports = ViewBag.ListReport;
+    List<Image> listImage = ViewBag.ListImage;
+    List<ReportedPostItem> reportedPostItems = ViewBag.reportedPostItems;
+
+}
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/amsScript/canvasjs.min.js"></script>
+<link href="~/Content/css/datatables.css" rel="stylesheet" />
+<style>
+    .button {
+        display: block;
+        width: 70px;
+        height: 35px;
+        background: #4E9CAF;
+        padding: 7px;
+        text-align: center;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .binh {
+        border-color: #1ABC9C;
+        box-shadow: none;
+    }
+
+    .media-item-ctr-1 {
+        border-bottom: 1px solid #e5e3da;
+        padding-bottom: 1em;
+        margin-top: 1em;
+        width: 100%;
+        position: relative;
+        float: left;
+    }
+
+        .media-item-ctr-1 .media-item-thumbnail {
+            display: block;
+            position: relative;
+            height: 120px;
+            width: 120px;
+        }
+
+    .media-ribbon {
+        position: absolute;
+        top: 15px;
+        left: -8px;
+        background-color: #ff4500;
+        padding: 0 3px;
+        font-family: 'Montserrat', sans-serif;
+        color: #fff;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        line-height: 24px;
+        font-size: 11px;
+    }
+
+    .media-item-ctr-1 .media-item-overview {
+        position: relative;
+        min-height: 140px;
+        padding-bottom: 15px;
+    }
+
+        .media-item-ctr-1 .media-item-overview .media-item-cat {
+            text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+        }
+
+        .media-item-ctr-1 .media-item-overview .media-meta-data {
+            margin-top: 10px;
+            color: #b5b3ac;
+            font-size: 11px;
+        }
+
+    .media-item-ctr-1 .social-share-ctr {
+        position: absolute;
+        right: 10px;
+        bottom: 20px;
+    }
+
+    .btn-facebook {
+        background-color: #395693;
+        color: #fff;
+    }
+
+    .btn-twitter {
+        background-color: #00acee;
+        color: #fff;
+    }
+</style>
+<div class="col-sm-offset-1 col-md-10">
+    <div class="panel panel-default">
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Quản Lý Báo Cáo</span>
+        </div>
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane fade active in" id="">
+                    <table id="myTables" class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="width: 20px;text-align: center" class="col-sm-1">
+                                    STT
+                                </th>
+                                <th style="text-align: center" class="col-sm-2">ID Bài viết</th>
+                                <th style="text-align: center" class="col-sm-4">Nội dung bài viết</th>
+                                <th style="text-align: center" class="col-sm-3">Số người báo cáo</th>
+                                <th style="text-align: center" class="col-sm-3">Hành động</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                int i = 0;
+                                foreach (var item in reportedPostItems)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="form-group">
+                                                <div class="col-sm-3">
+                                                    <span class="">@i</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@item.post.Id</td>
+                                        <td>
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <span class="" style="overflow: hidden !important;display: inherit;text-overflow: ellipsis;">
+                                                        @item.post.Body
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <span class="">@item.users.Count</span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            @{
+                                    if (item.post.Status == SLIM_CONFIG.POST_STATUS_HIDE)
+                                    {
+                                        <button class="btn btn-warning">Đã xóa</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-danger" onclick="hiddenPost(@item.post.Id)">Xóa bài viết</button>
+
+                                    }
+                                            }
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function hiddenPost(postId) {
+        console.log("hiddenPost. PostId: " + postId);
+        $.ajax({
+            url: "/Report/hiddenPost",
+            type: "POST",
+            data: {
+                postid: postId
+            },
+            success: function (successData) {
+                // alert(successData)
+                location.reload(false);
+            },
+            error: function (er) {
+                alert(er)
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        var myTables = $("#myTables").DataTable({
+            "oLanguage": {
+                //    "sSearch": "Tìm Kiếm" //search,
+                "sProcessing": "Đang xử lý...",
+                "sLengthMenu": "Xem _MENU_ mục",
+                "sZeroRecords": "Không tìm thấy dòng nào phù hợp",
+                "sInfo": "Đang xem _START_ đến _END_ trong tổng số _TOTAL_ mục",
+                "sInfoEmpty": "Đang xem 0 đến 0 trong tổng số 0 mục",
+                "sInfoFiltered": "(được lọc từ _MAX_ mục)",
+                "sInfoPostFix": "",
+                "sSearch": "Tìm:",
+                "sUrl": "",
+                "oPaginate": {
+                    "sFirst": "Đầu",
+                    "sPrevious": "Trước",
+                    "sNext": "Tiếp",
+                    "sLast": "Cuối"
+                }
+            },
+            "bLengthChange": false,
+            "bInfo": false,
+        });
+        generateTableIndex(myTables);
+    });
+</script>

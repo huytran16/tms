@@ -1,0 +1,37 @@
+﻿@{ 
+    List<House> allHouse = ViewBag.allHouse;
+}
+<div id="content">
+    
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>House ID</th>
+                <th>House Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ 
+                foreach(House h in allHouse)
+                {
+                    <tr>
+                        <th>
+                            @h.Id
+                        </th>
+                        <th>
+                            @h.Description
+                        </th>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    @*@using (Html.BeginForm("addBaiViet", "Quanli", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+
+
+    }*@
+
+
+</div>

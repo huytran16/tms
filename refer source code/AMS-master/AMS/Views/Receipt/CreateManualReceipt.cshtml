@@ -1,0 +1,396 @@
+﻿@using AMS.Constant
+@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.Title = "ManageReipt";
+    Layout = "~/Views/Management/__ManagementLayout.cshtml";
+    List<Block> block = ViewBag.block;
+    List<House> firstBlockFloor = ViewBag.firstBlockFloor;
+    List<House> rooms = ViewBag.rooms;
+
+    BalanceSheet balanceSheet = ViewBag.curentBls;
+}
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Tạo hóa đơn thủ công</span>
+            <ul class="nav nav-tabs pull-right" role="tablist">
+                <li>
+                    <a href="/Management/ManageReceipt/View"><i class="fa fa-file-text-o"></i> Quản lý hóa đơn</a>
+                </li>
+                <li class="active">
+                    <a href="/Management/ManageReceipt/CreateManualReceiptView"><i class="fa fa-file-o"></i> Tạo hóa đơn lẻ</a>
+                </li>
+                <li class="">
+                    <a href="/Management/ManageReceipt/CreateAutomationReceiptView"><i class="fa fa-files-o"></i> Tạo hóa đơn hàng loạt</a>
+                </li>
+                <li class="">
+                    <a href="/Management/ManageReceipt/ViewDownloadRecordTemplate"><i class="fa fa-cloud-download"></i> Tải bảng ghi nước</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel-body">
+            <form id="createNewOrder" class="form-horizontal" role="form">
+                <div class="tab-content">
+                    <div class="tab-pane fade active in" id="">
+                        <div class="alert alert-info hide" id="createReceiptSuccessNoti" @*style="display: none"*@>
+                            <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span>Hóa đơn được tạo thành công</span>
+                        </div>
+                        <div class="alert alert-danger hide" id="createReceiptFailedNoti">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                            <span>Việc tạo hóa đơn thất bại</span>
+                        </div>
+                        <div class="alert alert-danger" id="msgAddFailedNoty" style="display: none">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span id="notyMsg"></span>
+                        </div>
+                        @if (null == balanceSheet)
+                        {
+                            <div class="alert alert-danger">
+                                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <span> Mở bảng thu chi để tạo mới hóa đơn. Click vào <a href="/Management/BalanceSheet/ManageBalanceSheetView">đây</a> để đến trang quản lý thu chi.</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-8">
+                                    <fieldset class="scheduler-border less-padding">
+                                        <legend class="scheduler-border bold-black">Thông tin hóa đơn</legend>
+                                        <div class="form-group">
+                                            <label for="receiptTitle" class="col-md-2 control-label">Tiêu đề</label>
+                                            <div class="col-md-10">
+                                                <input id="receiptTitle" name="ReceiptTitle" type="text" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="houseBlock" class="col-md-2 control-label">Tòa nhà</label>
+                                            <div class="col-md-3 full-width-select">
+                                                <select id="houseBlock" name="select" class="form-control">
+                                                    @{foreach (var b in block)
+                                                    {
+                                                        <option value="@b.Id">@b.BlockName</option>
+                                                    }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <label for="houseFloor" class="col-md-1 control-label">Tầng</label>
+                                            <div class="col-md-2">
+                                                <select id="houseFloor" name="select" class="form-control">
+                                                    @{foreach (var f in firstBlockFloor)
+                                                    {
+                                                        <option value="@f.Floor">@f.Floor</option>
+                                                    }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <label for="houseId" class="col-md-1 control-label">Nhà</label>
+                                            <div class="col-md-3">
+                                                <select id="houseId" name="select" class="form-control">
+                                                    @{foreach (var r in firstBlockFloor)
+                                                    {
+                                                        <option value="@r.Id">@r.HouseName</option>
+                                                    }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">Tháng</label>
+                                            <div class="col-md-4">
+                                                <input type="text" id="forMonthView" value="@balanceSheet.StartDate.Value.ToString(AmsConstants.MonthYearFormat)" class="form-control" readonly="readonly"/>
+                                                <input type="hidden" id="blsId" value="@balanceSheet.Id" name="ForMonth" readonly="readonly"/>
+                                            </div>
+                                            <label for="receiptDesc" class="col-md-2 control-label">Ngày công bố</label>
+                                            <div class="col-md-4">
+                                                @*Donot clean this code*@
+                                                <input type="text" id="publishDate" name="PublishDate" class="form-control datepicker" data-date-format="dd-mm-yyyy" data-date-language="vi"
+                                                       data-date-min-view-mode="0" data-date-today-highlight="true" data-date-start-date="0d"/>
+                                            </div>
+                                        </div>
+                                        @*<div class="form-group">
+                                            <label for="receiptDesc" class="col-md-2 control-label">Loại hóa đơn</label>
+                                            <div class="col-md-4">
+                                                <input class="form-control" id="receiptType" type="text" value="Dịch vụ sửa chữa"/>
+                                                <input type="hidden" value="@SLIM_CONFIG.UTILITY_SERVICE_TYPE_HD_REQUEST" name="ReceiptType"/>
+                                            </div>
+                                        </div>*@
+                                        <div class="form-group">
+                                            <label for="receiptDesc" class="col-md-2 control-label">Mô tả</label>
+                                            <div class="col-md-10">
+                                                <textarea id="receiptDesc" name="ReceiptDesc" class="form-control" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <fieldset class="scheduler-border less-padding">
+                                        <legend class="scheduler-border bold-black">Chi tiết hóa đơn</legend>
+                                        <div class="form-group">
+                                            <div class="col-md-5">
+                                                <strong style="align-content: center">Tên</strong>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <strong style="align-content: center">Số lượng</strong>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <strong style="align-content: center">Đơn giá</strong>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <strong style="align-content: center">Thành tiền</strong>
+                                            </div>
+                                        </div>
+                                        <div id="receiptWrapper">
+                                            @{for (int i = 0; i < 3; i++)
+                                              {
+                                                  <div id="row_@(i + 1)" class="form-group">
+                                                <div class="col-md-5">
+                                                          <input id="item_name_@(i + 1)" name="order-item-name" type="text" class="form-control order-item">
+                                                </div>
+                                                <div class="col-md-2">
+                                                          <input id="item_qty_@(i + 1)" name="order-item-qty" type="text" class="form-control order-item-qty">
+                                                </div>
+                                                <div class="col-md-2">
+                                                          <input id="item_unit_price_@(i + 1)" name="order-item-price" type="text" class="form-control order-item-price">
+                                                </div>
+                                                <div class="col-md-2">
+                                                          <input id="item_qty_price_@(i + 1)" readonly="readonly" name="total-order" type="text" class="form-control total-order">
+                                                </div>
+                                                      <span class="btn btn-danger btn-xs" onclick="deleteItem(@(i + 1))"><i class="fa fa-times"></i></span>
+                                            </div>
+                                              }
+                                            }
+                                                </div>
+
+                                        <div class="form-group">
+                                            <div class="col-md-3">
+                                                <span id="addNewRow" name="addNewRow" class="btn btn-stroke btn-primary"><i class="fa fa-plus"> Thêm</i></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="font-size: 20px; text-align: right">
+                                            <div class="col-md-offset-7 col-md-2">
+                                                <strong style="align-content: center">Tổng</strong>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="input-group">
+                                                    <input id="total" type="text" class="form-control"/>
+                                                    <span class="input-group-addon">đồng</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="pull-right">
+                                    <button type="submit" onclick="validateSubmit('1')" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Lưu</button>
+                                    <button type="submit" onclick="validateSubmit('2')" class="btn btn-info"><i class="fa fa-globe"></i> Công bố</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <input type="hidden" id="mode"/>
+                    <input type="hidden" id="userId" value="@User.Identity.GetUserId()"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+//    document.getElementById("publishDate").dataset.dateEndDate = "+" + calculateDateFromTodayToEndOfMonth() + "d";
+
+    $(document).ready(function () {
+
+        window.index = 3;
+        $("#addNewRow").on("click", function () {
+            window.index++;
+            var tag = "<div id=\"row_" + index + "\" class='form-group'>" +
+                "<div class='col-md-5'><input id=\"item_name_" + index + "\" type='text' name='order-item-name' class='form-control order-item'></div>" +
+                "<div class='col-md-2'><input type='text' id=\"item_qty_" + index + "\" name='order-item-qty' class='form-control order-item-qty'></div>" +
+                "<div class='col-md-2'><input id=\"item_unit_price_" + index + "\"type='text' name='order-item-price' class='form-control order-item-price'></div>" +
+                "<div class='col-md-2'><input id=\"item_qty_price_" + index + "\" type='text' name='total-order' readonly='readonly' class='form-control'></div>" +
+                "<span class='btn btn-danger btn-xs' onclick='deleteItem(\"" + index + "\")'><i class='fa fa-times'></i></span>" +
+                "</div>";
+            $("#receiptWrapper").append(tag);
+        });
+        bindingCalculateSubTotal();
+//        jQuery.validator.addMethod("date",
+//            function(value, element) {
+//                var date = value.split("-");
+//                var d = parseInt(date[0], 10),
+//                    m = parseInt(date[1], 10),
+//                    y = parseInt(date[2], 10);
+//                return new Date(y, m - 1, d);
+//            },
+//            "Thời gian không chính xác");
+        validCreateManualReceipt();
+    });
+    function deleteItem(id) {
+        if ($("#receiptWrapper").children().length > 1) {
+            $("#row_" + id)[0].parentNode.removeChild($("#row_" + id)[0]);
+        }
+    }
+    function validateSubmit(mode) {
+        $("#mode").val(mode);
+        $("#createNewOrder").valid();
+    }
+    function createReceipt(fromUserId, mode) {
+        var contentObj = $("#receiptWrapper > .form-group");
+        var numberOfRow = contentObj.length;
+        var receiptName = $("#receiptTitle").val();
+        var receiptDesc = $("#receiptDesc").val();
+        var houseId = $("#houseId").val();
+        var receiptType = $("#receiptType").val();
+        var balanceSheetId = $("#blsId").val();
+        var publishDate = $("#publishDate").val();
+
+        var userId = fromUserId;
+
+        var listItem = [];
+        for (var i = 0; i < numberOfRow; i++) {
+            var rowIdStr = $(contentObj[i]).prop("id").split("row_");
+            var id = rowIdStr[1];
+            var name = $("#item_name_" + id).val();
+            var qty = replaceCommaNumber($("#item_qty_" + id).val());
+            var unitPrice = replaceCommaNumber($("#item_unit_price_" + id).val());
+            if (name && qty && unitPrice) {
+                var item = {
+                    Name: name,
+                    UnitPrice: unitPrice,
+                    Quantity: qty
+                };
+                listItem.push(item);
+            }
+        }
+        var orderItem = {
+            Creator: userId,
+            ReceiptTitle: receiptName,
+            ReceiptDesc: receiptDesc,
+            ReceiptHouseId: houseId,
+            ReceiptType: receiptType,
+            PublishDate: publishDate,
+            ListItem: listItem,
+            BalanceSheetId: balanceSheetId,
+            Mode: mode
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Management/ManageReceipt/AddNewReceipt",
+            data: $.param(orderItem),
+            success: function (data) {
+                if (data.StatusCode === 0) {
+                    smoothScrollToTop();
+                    $("#createReceiptSuccessNoti").removeClass("hide").addClass("show");
+                    setTimeout(function () {
+                        $("#createReceiptSuccessNoti").removeClass("show").addClass("hide");
+                        resetFromNotField();
+                    }, 3000);
+                } else if (data.StatusCode === 4) {
+                    var msg = "Bảng thu chi của tháng <strong>" + $("#forMonthView").val() + "</strong> đã đóng. Xin nhập lại tháng khác.";
+                    $("#notyMsg").html(msg);
+                    $("#msgAddFailedNoty").fadeIn("fast");
+                    setTimeout(function () {
+                        $("#msgAddFailedNoty").fadeOut("fast");
+                    }, 3000);
+                } else if (data.StatusCode === 5) {
+                    var msg = "Không tìm thấy bảng thu chi";
+                    $("#notyMsg").html(msg);
+                    $("#msgAddFailedNoty").fadeIn("fast");
+                    setTimeout(function () {
+                        $("#msgAddFailedNoty").fadeOut("fast");
+                    }, 3000);
+                } else {
+                    $("#createReceiptFailedNoti").removeClass("hide").addClass("show");
+                    setTimeout(function () {
+                        $("#createReceiptFailedNoti").removeClass("show").addClass("hide");
+                    }, 3000);
+                }
+            },
+            error: function () {
+            }
+        });
+    }
+    function resetFromNotField(id) {
+        $("#createNewOrder").closest("form").find("input[type=text]:not(#forMonthView,#receiptType), textarea").val("");
+    }
+    function validCreateManualReceipt() {
+        $("#createNewOrder").validate({
+            rules: {
+                ReceiptTitle: {
+                    required: true,
+                    maxlength: 255
+                },
+                PublishDate: {
+                    required: true
+                },
+                ReceiptDesc: {
+                    maxlength: 1000
+                },
+                "order-item-name": {
+                    required: function (elem) {
+                        if ($(elem).val()&& $(elem).val().trim().length < 255) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                },
+                "order-item-qty": {
+                    required: function (elem) {
+                        if ($(elem).val()) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                },
+                "order-item-price": {
+                    required: function (elem) {
+                        if ($(elem).val()) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                },
+
+            },
+            messages: {
+                ReceiptTitle: {
+                    required: "Trường bắt buộc",
+                    maxlength: "Tối đa 255 ký tự."
+                },
+                PublishDate: {
+                    required: "Trường bắt buộc"
+                },
+                ReceiptDesc: {
+                    maxlength: "Tối đa 1000 ký tự."
+                },
+                "order-item-name": {
+                    required: "Trường bắt buộc và tối đa 255 ký tự",
+                },
+                "order-item-qty": {
+                    required: "Trường bắt buộc",
+                },
+                "order-item-price": {
+                    required: "Trường bắt buộc",
+                },
+
+            },
+            submitHandler: function () {
+                var userId = $("#userId").val();
+                var mode = $("#mode").val();
+                createReceipt(userId, mode);
+            }
+        });
+    }
+</script>

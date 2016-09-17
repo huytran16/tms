@@ -1,0 +1,207 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Chi tiết dịch vụ";
+    Layout = "~/Views/Home/_socialNetworkLayout.cshtml";
+    List<AroundProviderProduct> products = ViewBag.Products;
+    AroundProvider curProvider = ViewBag.CurProvider;
+    int curUserRate = ViewBag.CurUserRate;
+    int rateCount = ViewBag.RateCount;
+    double ratePoint = ViewBag.RatePoint;
+}
+
+<link href="~/Content/aroundProvider/main.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-md-12">
+                <ol class="breadcrumb">
+                    <li><a href="/Home/AroundService/All">Dịch vu xung quanh</a></li>
+                    <li><a href="/Home/AroundService/All?catId=@curProvider.AroundProviderCategoryId">@curProvider.AroundProviderCategory.Name</a></li>
+                    <li class="active"><a href="/Home/AroundService/SingleProviderDetail?id=@curProvider.Id">@curProvider.Name</a></li>
+                </ol>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-8 page-title" id="left" data-user-id="@User.Identity.GetUserId()" data-prov-id="@curProvider.Id"
+                     data-cur-user-rate="@curUserRate" data-rate-count="@rateCount" data-rate-point="@ratePoint">
+
+                    <h2 class="text-capitalize">@curProvider.Name</h2>
+
+                    <ul class="provider-info" style="font-size: 16px;">
+
+                        <li>
+                            <i class="fa fa-eye"></i> <strong>Lượt xem:</strong> <span>@curProvider.ClickCount </span>
+                        </li>
+                        <li>
+                            <i class="fa fa-heart-o "></i> <strong>Đánh giá:</strong> <span id="providerRate"></span> <strong id="providerRateUser"></strong>
+                        </li>
+                        <li>
+                            <i class="fa fa-map-marker"></i> <strong>Địa chỉ:</strong> <span>@curProvider.Address</span>
+                        </li>
+                        <li>
+                            <i class="fa fa-phone"></i> <strong>Điện thoại:</strong> <span>@curProvider.Tel</span>
+                        </li>
+                        <li>
+                            <i class="fa fa-comment-o"></i> <strong>Mô tả:</strong> <span>@curProvider.Description </span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4" style="margin-top: 2%">
+                    <div class="col-md-12">
+                        <div class="single-project">
+                            <section>
+                                <div class="project-preview" style="overflow: hidden; border-bottom: 2px solid #ccc;">
+                                    <img style="width: 100%;" src="@curProvider.ImageUrl"/>
+                                </div>
+
+                                <div class="project-link" style="z-index: 3; font-size: 16px;">
+                                    @{
+                                        if (curUserRate == -1)
+                                        {
+                                            <div id="rateMessage"><i style="color: #aaa" class="fa fa-check-circle"></i> <span style="font-weight: bold;"> Chưa Đánh Giá</span></div>
+                                        }
+                                        else
+                                        {
+                                            <div id="rateMessage">
+                                                <i style="color: #25ad9f" class="fa fa-check-circle"></i> <span style="font-weight: bold;"> Đã Đánh Giá</span>
+                                            </div>
+                                        }
+                                    }
+                                    <div id="userRate"></div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-offset-8 col-md-4">
+                        <div class="pull-right" style="text-align: center;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Divider heart-->
+            <div class="divider text-center">
+                <i class="fa fa-heart-o fa-lg"></i>
+            </div>
+            <!--End divider-->
+
+            <div class="col-md-12">
+                <div class="page-title">
+                    <h2>Các sản phẩm</h2>
+                </div>
+                <div class="col-md-12">
+                    <div class="section group">
+                        <ul>
+                            @{
+                                foreach (var product in products)
+                                {
+                                    <li class="provider-product">
+                                        <div class="row product-info">
+                                            <div class="product-img">
+                                                <img src="@product.ImgUrl"/>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="desc">
+                                                    <div class="left-text truncate" style="float: left; width: 100%; text-align: left; margin-top: 3px;">
+                                                        <strong style="font-size: 18px; text-transform: capitalize;">
+                                                            @product.Name
+                                                        </strong>
+                                                    </div>
+                                                    <div style="float: right; width: 100%; font-size: 15px; color: #4b4f56; text-align: right; font-weight: bold;" class="price">
+                                                        @product.Price.Value.ToString("N0") <small>đ</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                        @*<div class="clear"></div>*@
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="page-title">
+                    <h2>Bản đồ</h2>
+                </div>
+                <div style="height: 300px; width: 100%;" id="map"><!--map-canvas will be postioned here--></div>
+            </div>
+            <input type="hidden" id="lat" value="@curProvider.Latitude"/>
+            <input type="hidden" id="lng" value="@curProvider.Longitude"/>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8T4uVRg-6S4KK39kPUldWKATbqgOm4VE&v=3.exp&amp;sensor=false"></script>
+<script src="~/Scripts/aroundProvider/map.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        $.fn.raty.defaults.path = '/Content/images';
+        var dataElement = $("#left");
+        var ratePoint = dataElement.data("ratePoint");
+        var rateCount = dataElement.data("rateCount");
+        var curUserRate = dataElement.data("curUserRate");
+        $("#providerRate").raty({
+            score: ratePoint, number: 5,
+            readOnly: true,
+        });
+        if (rateCount != "0") {
+            $("#providerRateUser").html("<span>" + rateCount + " người </span>");
+        }
+
+        if (curUserRate == "-1") {
+            $("#userRate").raty({
+                number: 5, click: function (score, evt) {
+                    if ($("#left").data("curUserRate") != "-1") {
+                        return false;
+                    }
+                    $("#left").data("curUserRate", score);
+                    $('#userRate').raty('readOnly', true);
+                    var userId = $("#left").data("userId");
+                    var providerId = $("#left").data("provId");
+                    $.ajax({
+                        url: "/Home/AroundService/UserRate",
+                        data: {
+                            userId: userId,
+                            providerId: providerId,
+                            point: score
+                        },
+                        type: "POST",
+                        success: function (data) {
+                            if (data.StatusCode === 0) {
+                                $("#providerRate")
+                                    .raty({
+                                        score: data.Data.point,
+                                        readOnly: true
+                                    });
+                                $("#rateMessage > span").text("Đã Đánh Giá");
+                                $("#rateMessage > i").css("color", "#25ad9f");
+                            } else if (data.StatusCode === 2) {
+                                $("#rateMessage > span").text("Đã Đánh Giá");
+                                $("#rateMessage > i").css("color", "#25ad9f");
+                                $("#userRate").raty({
+                                    score: data.Data,
+                                    readOnly: true
+                                });
+                            } else {
+                                $("#left").data("curUserRate", "-1");
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            $("#userRate").raty({
+                score: curUserRate, number: 5, readOnly: true,
+            });
+        }
+    });
+</script>
+

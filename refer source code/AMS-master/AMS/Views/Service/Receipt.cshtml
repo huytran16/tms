@@ -1,0 +1,290 @@
+﻿@{
+    ViewBag.Title = "Receipt";
+    Layout = "~/Views/Service/_ServiceLayout.cshtml";
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="~/Scripts/graph.js"></script>
+}
+<div  class="col-md-12">
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active">
+                    <a href="#thismonth" role="tab" data-toggle="tab"><i class="fa fa-fw fa-calendar"></i> Tháng này</a>
+                </li>
+                <li class="">
+                    <a href="#all" role="tab" data-toggle="tab"><i class="fa fa-fw fa-th-list"></i> Lịch sử</a>
+                </li>
+
+                @*<li class="">
+                        <a href="#unpaid" role="tab" data-toggle="tab"><i class="fa fa-fw fa-ticket"></i> Chưa thanh toán</a>
+                    </li>*@
+
+                <li class="">
+                    <a href="#graph" role="tab" data-toggle="tab"><i class="fa fa-fw fa-pie-chart"></i> Thống kê</a>
+                </li>
+
+
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade active in" id="thismonth">
+                    <div class="panel panel-default">
+                        <div class="panel-heading panel-heading-gray">Hóa đơn</div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" role="form">
+                                <div class="timeline row" data-toggle="gridalicious">
+                                    <div class="timeline-block" data-toggle="modal" data-target="#myModal">
+                                        <div class="panel panel-default user-box">
+                                            <div class="panel-body">
+                                                <div class="media">
+                                                    <img src="/images/people/50/guy-6.jpg" alt="people" class="media-object img-circle pull-left" />
+                                                    <div class="media-body" style="float: left;">
+                                                        <a href="" class="username">Tiền điện</a>
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-users"></i> 200,000 vnd </span>
+                                                        </div>
+                                                        <div class="profile-icons">
+                                                            <span> </span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="media-body" style="float: right;">
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-check"></i> Đã thanh toán  </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-block" data-toggle="modal" data-target="#myModal1">
+                                        <div class="panel panel-default user-box">
+                                            <div class="panel-body">
+                                                <div class="media">
+                                                    <img src="/images/people/50/guy-6.jpg" alt="people" class="media-object img-circle pull-left" />
+                                                    <div class="media-body" style="float: left;">
+                                                        <a href="" class="username">Tiền nước</a>
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-users"></i> 100,000 vnd </span>
+                                                        </div>
+                                                        <div class="profile-icons">
+                                                            <span> </span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="media-body" style="float: right;">
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-question"></i> Chưa thanh toán  </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-block" data-toggle="modal" data-target="#myModal2">
+                                        <div class="panel panel-default user-box">
+                                            <div class="panel-body">
+                                                <div class="media">
+                                                    <img src="/images/people/50/guy-6.jpg" alt="people" class="media-object img-circle pull-left" />
+                                                    <div class="media-body" style="float: left;">
+                                                        <a href="" class="username">Tiền điện</a>
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-users"></i> 200,000 vnd </span>
+                                                        </div>
+                                                        <div class="profile-icons">
+                                                            <span> </span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="media-body" style="float: right;">
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-check"></i> Đã thanh toán  </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    </div>
+                              
+                            
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="all">
+                    <div class="panel panel-default">
+                        <!-- Progress table -->
+                        <div class="panel-body">
+                            <form class="form-horizontal" role="form">
+                                <div class="timeline row" data-toggle="gridalicious">
+                                    <div class="timeline-block">
+                                        <div class="panel panel-default user-box">
+                                            <div class="panel-body">
+                                                <div class="media">
+                                                    <img src="/images/people/50/guy-6.jpg" alt="people" class="media-object img-circle pull-left" />
+                                                    <div class="media-body" style="float: left;">
+                                                        <a href="" class="username">Tiền điện</a>
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-users"></i> 200,000 vnd </span>
+                                                        </div>
+                                                        <div class="profile-icons">
+                                                            <span> </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="media-body" style="float: right;">
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-check"></i> Đã thanh toán  </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-block">
+                                        <div class="panel panel-default user-box">
+                                            <div class="panel-body">
+                                                <div class="media">
+                                                    <img src="/images/people/50/guy-6.jpg" alt="people" class="media-object img-circle pull-left" />
+                                                    <div class="media-body" style="float: left;">
+                                                        <a href="" class="username">Tiền nước</a>
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-users"></i> 100,000 vnd </span>
+                                                        </div>
+                                                        <div class="profile-icons">
+                                                            <span> </span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="media-body" style="float: right;">
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-question"></i> Chưa thanh toán  </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-block">
+                                        <div class="panel panel-default user-box">
+                                            <div class="panel-body">
+                                                <div class="media">
+                                                    <img src="/images/people/50/guy-6.jpg" alt="people" class="media-object img-circle pull-left" />
+                                                    <div class="media-body" style="float: left;">
+                                                        <a href="" class="username">Tiền điện</a>
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-users"></i> 200,000 vnd </span>
+                                                        </div>
+                                                        <div class="profile-icons">
+                                                            <span> </span>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="media-body" style="float: right;">
+                                                        <div class="profile-icons">
+                                                            <span><i class="fa fa-check"></i> Đã thanh toán  </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                               
+
+                            </form>
+                        </div>
+
+                        <!-- // Progress table -->
+                        <div class="panel-footer padding-none text-center">
+                            <ul class="pagination">
+                                <li>
+                                    <a href="#">«</a>
+                                </li>
+                                <li class="active">
+                                    <a href="#">1</a>
+                                </li>
+                                <li>
+                                    <a href="#">2</a>
+                                </li>
+                                <li>
+                                    <a href="#">3</a>
+                                </li>
+                                <li>
+                                    <a href="#">4</a>
+                                </li>
+                                <li>
+                                    <a href="#">5</a>
+                                </li>
+                                <li>
+                                    <a href="#">»</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+           
+
+                <div class="tab-pane fade" id="graph">
+                    <div id="chart_div"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Chi tiết </h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-3 control-label">Tiền điện</label>
+                            <div class="col-sm-9">
+                                <input type="email" readonly="readonly" class="form-control" id="inputEmail3" value="Mr. A">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-3 control-label">Điện tiêu thụ</label>
+                            <div class="col-sm-9">
+                                <input type="email" readonly="readonly" class="form-control" id="inputEmail3" value="30 kw">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-3 control-label">Ngày xuất hóa đơn</label>
+                            <div class="col-sm-9">
+                                <input type="email" readonly="readonly" class="form-control" id="inputEmail3" value="12/12/2016">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-3 control-label">Trạng thái</label>
+                            <div class="col-sm-9">
+                                <span><i class="fa fa-check"></i> Đã thanh toán  </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-3 control-label">Hạn nộp tiền</label>
+                            <div class="col-sm-9">
+                                <input type="email" readonly="readonly" class="form-control" id="inputEmail3" value="12/12/2016">
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+               
+                <button type="button" class="btn btn-primary">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>

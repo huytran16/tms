@@ -1,0 +1,130 @@
+﻿@using AMS.Service
+@using Microsoft.AspNet.Identity;
+@{
+    Layout = null;
+    UserService userService = new UserService();
+    String profileImg = "/Content/images/defaultProfile.png";
+    string userId = User.Identity.GetUserId();
+    string userFullName = "";
+    if (userId != null)
+    {
+        User curUser = userService.findById(Int32.Parse(userId));
+        if (curUser != null && curUser.ProfileImage != null && !curUser.ProfileImage.Equals(""))
+        {
+            profileImg = curUser.ProfileImage;
+        }
+        if (null != curUser && curUser.Fullname != null)
+        {
+            userFullName = curUser.Fullname;
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Scripts.Render("~/bundles/jquery")
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/css/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <script src="~/Scripts/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="~/Content/css/jquery-ui.min.css">
+    <link rel="stylesheet" href="~/Content/css/dataTables.bootstrap.min.css">
+    <link href="~/Content/css/jquery.datetimepicker.css" rel="stylesheet" />
+</head>
+<body class="breakpoint-1024">
+
+    <div class="navbar navbar-main navbar-primary navbar-fixed-top navbar-primary-manager" role="navigation">
+        <div class="container-fluid">
+            @*            <div class="navbar-header">*@
+            @*                <a class="navbar-brand" href="index.html">AMS</a>*@
+            @*            </div>*@
+            <div class="navbar-header">
+                <ul class="nav navbar-nav navbar-nav-manager">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle user truncate" data-toggle="dropdown">
+                            <img onerror="this.onerror = null; this.src = '/Content/images/defaultProfile.png'; " src="@profileImg" class="img-circle" width="40">
+                            <span  class="caption">@userFullName </span> <span class="caret ams-caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="/Home/ViewProfile">Thông tin cá nhân</a>
+                            </li>
+                            <li>
+                                <a href="/Account/LogOff">Đăng xuất</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="navbar-collapse collapse" id="main-nav" style="height: 1px;">
+                <ul class="nav navbar-nav manager-header">
+                    <li style="background-color:#25ad9f">
+                        <a href="/"><i class="fa fa-fw fa-users"></i>Mạng xã hội</a>
+                    </li>
+                    <li id="hdRequestNav">
+                        <a href="/Management/HelpdeskRequest/ManageHdRequest"><i class="fa fa-life-ring"></i>Yêu cầu</a>
+                    </li>
+                    <li id="userNav">
+                        <a href="/Management/ManageUser/ViewResidentList"><i class="fa fa-user"></i> Tài khoản</a>
+                    </li>
+                    <li id="receiptNav">
+                        <a href="/Management/ManageReceipt/View"><i class="fa fa-file-text-o"></i> Hóa đơn</a>
+                    </li>
+                    <li id="balanceSheetNav">
+                        <a href="/Management/BalanceSheet/View"><i class="fa fa-dollar"></i> Thu chi</a>
+                    </li>
+                    <li id="reportNav">
+                        <a href="/Report/Report"><i class="fa fa fa-bell-o"></i> Báo cáo</a>
+                    </li>
+                    <li id="surveyNav">
+                        <a href="/Survey/Survey"><i class="fa fa-list-ol"></i> Khảo sát</a>
+                    </li>
+                    <li id="serviceProviderNav">
+                        <a href="/Management/AroundService/Manage"><i class="fa fa-search-plus"></i> Dịch vụ</a>
+                    </li>
+                    <li id="residentHouseNav">
+                        <a href="/Management/Config/UtilityService/ViewManageHouseBlock"><i class="fa fa-home"></i> Căn hộ</a>
+                    </li>
+                    @*<li id="configNav" class="">
+                            <a href="/Management/Config/UtilityService/View"><i class="fa fa-wrench"></i> Cấu Hình</a>
+                        </li>*@
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="st-container" style="margin-top: 20px">
+
+        <div id="content" style="margin-left: 0">
+            @RenderBody()
+            <!--Footer-->
+            @*            <div class="footer" style="left: 0px">*@
+            @*                Social Network Template © Copyright Notice*@
+            @*            </div>*@
+        </div>
+    </div>
+
+
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="~/Scripts/amsScript/vendor.js"></script>
+    <script src="~/Scripts/amsScript/scripts.js"></script>
+    <script src="~/Scripts/amsScript/custom.js"></script>
+    <script src="~/Scripts/amsScript/jquery.validate.js"></script>
+    <script src="~/Scripts/amsScript/additional-methods.js"></script>
+    <script src="~/Scripts/amsScript/jquery.timepicker.min.js"></script>
+    <script src="~/Scripts/jquery.datetimepicker.full.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>
+
+
+
+
+

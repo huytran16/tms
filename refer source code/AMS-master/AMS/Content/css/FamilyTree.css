@@ -1,0 +1,447 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+}
+
+.tree ul {
+    padding-top: 20px;
+    position: relative;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+}
+
+.tree li {
+    float: left;
+    text-align: center;
+    list-style-type: none;
+    position: relative;
+    padding: 20px 5px 0 5px;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+}
+
+    /*We will use ::before and ::after to draw the connectors*/
+
+    .tree li::before, .tree li::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 50%;
+        border-top: 1px solid #ccc;
+        width: 50%;
+        height: 20px;
+    }
+
+    .tree li::after {
+        right: auto;
+        left: 50%;
+        border-left: 1px solid #ccc;
+    }
+
+    /*We need to remove left-right connectors from elements without 
+any siblings*/
+    .tree li:only-child::after, .tree li:only-child::before {
+        display: none;
+    }
+
+    /*Remove space from the top of single children*/
+    .tree li:only-child {
+        padding-top: 0;
+    }
+
+    /*Remove left connector from first child and 
+right connector from last child*/
+    .tree li:first-child::before, .tree li:last-child::after {
+        border: 0 none;
+    }
+    /*Adding back the vertical connector to the last nodes*/
+    .tree li:last-child::before {
+        border-right: 1px solid #ccc;
+        border-radius: 0 5px 0 0;
+        -webkit-border-radius: 0 5px 0 0;
+        -moz-border-radius: 0 5px 0 0;
+    }
+
+    .tree li:first-child::after {
+        border-radius: 5px 0 0 0;
+        -webkit-border-radius: 5px 0 0 0;
+        -moz-border-radius: 5px 0 0 0;
+    }
+
+/*Time to add downward connectors from parents*/
+.tree ul ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 1px solid #ccc;
+    width: 0;
+    height: 20px;
+}
+
+.tree li a {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #666;
+    font-family: arial, verdana, tahoma;
+    font-size: 11px;
+    display: inline-block;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+}
+
+.familymember {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #666;
+    font-family: arial, verdana, tahoma;
+    font-size: 11px;
+    display: inline-block;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    margin: 5px;
+}
+
+    .familymember.border {
+        border: 2px solid rgba(0, 0, 0, 0.25);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .125);
+        border-radius: 4px;
+        margin: 0 auto 5vh auto;
+    }
+
+}
+
+/*Time for some hover effects*/
+/*We will apply the hover effect the the lineage of the element also*/
+.tree li a:hover, .tree li a:hover + ul li a {
+    background: #c8e4f8;
+    color: #000;
+    border: 1px solid #94a0b4;
+}
+    /*Connector styles on hover*/
+    .tree li a:hover + ul li::after,
+    .tree li a:hover + ul li::before,
+    .tree li a:hover + ul::before,
+    .tree li a:hover + ul ul::before {
+        border-color: #94a0b4;
+    }
+
+
+
+/*AnLTNM star change*/
+.range-frame {
+    /*display: table;*/
+    text-align: center;
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .125);
+    margin: 0 auto;
+    width: 100%;
+    border-top: none;
+}
+
+.range-frame-header {
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0px 2px rgba(0, 0, 0, .125);
+    background-color: #212121;
+    border-bottom: none;
+    color: #f9a825;
+    line-height: 30px;
+}
+
+
+.house-roof {
+    width: 100%;
+    position: relative;
+}
+
+    .house-roof:before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        left: 0;
+        border-bottom: 140px solid #d2593c;
+        border-left: 55px solid transparent;
+        border-right: 55px solid transparent;
+        display: inline-block;
+    }
+
+
+    .house-roof > span {
+        line-height: 140px;
+    }
+
+.link-cursor:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.abs-centering {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    padding-top: 10px;
+}
+
+
+.house-title {
+    color: #fff;
+    font-size: 31px;
+}
+
+.member-name-title {
+    font-size: 20px;
+    font-weight: 100;
+    padding: 0 15px;
+    margin-top: 3px;
+    color: #fff;
+}
+
+.recent-activ-title {
+    font-size: 14px;
+    color: #757575;
+}
+
+    .recent-activ-title > strong {
+        color: #009688;
+        font-size: 16px;
+        font-weight: normal;
+    }
+
+/*AnLTNM change*/
+textarea {
+    width: 100% !important;
+    min-width: 0;
+}
+
+ul.timeline-list li.media > .media-body .panel {
+    min-width: 0px;
+    width: 100%;
+    border: 1px solid;
+    border-color: #e5e6e9 #dfe0e4 #d0d1d5;
+    border-radius: 3px;
+    box-shadow: none;
+    margin-bottom: 0;
+}
+
+.custom-panel {
+    min-width: 0px;
+    width: 100%;
+    border: 1px solid;
+    border-color: #e5e6e9 #dfe0e4 #d0d1d5;
+    border-radius: 3px;
+    box-shadow: none;
+}
+
+ul.timeline-list li.media > .media-body .panel.share {
+    z-index: 1031;
+}
+
+.panel.panel-default ul.comments {
+    width: 100%;
+    margin-left: 0;
+}
+
+.panel-footer {
+    padding: 10px 15px !important;
+}
+
+.avatar-comment {
+    border-radius: 30px;
+    height: 34px;
+}
+
+.input-cmnt {
+    width: 100%;
+    padding-right: 35px;
+}
+
+.avartar-img {
+    width: 50px;
+    height: 50px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .125);
+}
+
+.preview-img {
+    border: 1px solid #777777;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.post-heading {
+    color: #1d2129;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 19px;
+    padding: 0 10px;
+}
+
+    .post-heading:hover {
+        color: #25ad9f;
+        text-decoration: none;
+    }
+
+.post-heading-icon {
+    color: #25ad9f;
+    font-size: 17px;
+}
+
+.house-name {
+    float: right;
+    border: solid 2px;
+    border-radius: 4px;
+    padding: 5px;
+    border-color: #ced0d4;
+    color: #333333;
+    background-color: #f6f7f9;
+    border-color: #ced0d4;
+    color: #4b4f56;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .125);
+    line-height: 12px;
+}
+
+.user-name {
+    font-size: 17px;
+    line-height: 1.38;
+    color: #555555;
+}
+
+.icon-house {
+    color: #25ad9f;
+    font-size: 15px;
+    margin-right: 5px;
+}
+
+p {
+    font-size: 15px;
+    font-weight: normal;
+    line-height: 1.38;
+}
+
+.post-time {
+    color: #999999;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+ul.timeline-list li.media > .media-body {
+    margin: 0 0 10px 0;
+}
+
+ul.timeline-list li.media:before {
+    position: static;
+    display: inline;
+    top: 0;
+    content: '';
+    height: initial;
+    margin-left: 0;
+    border-left: none;
+    z-index: 0;
+}
+
+#recentActivity > li:last-child {
+    border-bottom: none !important;
+}
+
+.in-house-avar {
+    overflow: hidden;
+    margin: 0 auto;
+    position: relative;
+}
+
+    .in-house-avar > .mem-remove {
+        background: rgba(0,0,0,.75);
+        position: absolute;
+        text-align: center;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        -webkit-transition: opacity .25s ease;
+        -moz-transition: opacity .25s ease;
+    }
+
+    .in-house-avar:hover .mem-remove {
+        opacity: 1;
+    }
+
+    .in-house-avar:hover .del-time {
+        color: #E53935;
+    }
+
+.del-time {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 30px;
+    color: #757575;
+}
+/*End change*/
+a:active, a:hover {
+    text-decoration: none;
+    cursor: pointer;
+    color: #25ad9f;
+}
+
+a, a {
+    color: #555555;
+}
+
+.img:active, img:hover {
+    cursor: pointer;
+}
+
+.noti-element {
+    padding: 5px 0;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+    .noti-element:last-child {
+        border-bottom: none;
+    }
+
+#clean-noty {
+    font-weight: bold;
+    color: #212121;
+    cursor: pointer;
+}
+
+.user-post {
+}
+
+    .user-post::before,
+    .user-post::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-color: transparent;
+        border-style: solid;
+    }
+
+    .user-post::before {
+        border-width: 2.1em;
+        border-right-color: #e5e6e9;
+        border-top-color: #e5e6e9;
+    }
+
+    .user-post::after {
+        /*border-radius: 0.4em;*/
+        border-width: 1.7em;
+        border-right-color: #009688;
+        border-top-color: #009688;
+    }

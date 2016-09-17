@@ -1,0 +1,606 @@
+﻿@using AMS.Service
+@model AMS.ViewModel.SurveyViewModel
+@{
+    ViewBag.Title = "DetailSurvey";
+    Layout = "~/Views/Management/__ManagementLayout.cshtml";
+    Poll surveys = ViewBag.Survey;
+    //   List<Question> questions = ViewBag.Question;
+    List<string> answers = ViewBag.Answer;
+    List<string> listAnswer = ViewBag.CountAnswer;
+    List<Double> listEach = ViewBag.Each;
+    BlockPollService BlockPollService = new BlockPollService();
+    BlockService blockService = new BlockService();
+    string alert = ViewBag.alert;
+}
+<link href="~/Content/css/datepicker.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap-datepicker.min.js"></script>
+<script src="~/Scripts/moment.min.js"></script>
+<script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
+<script src="~/Scripts/en-gb.js"></script>
+
+<style>
+    #rcorners2 {
+        border: 2px solid #73AD21;
+        height: 50px;
+        width: auto;
+    }
+
+    #rcorners3 {
+        height: 50px;
+    }
+
+    #rcorners1 {
+        height: 50px;
+    }
+
+    .isa_info, .isa_success, .isa_warning, .isa_error {
+        margin: 10px 0px;
+        padding: 12px;
+    }
+
+    .isa_info {
+        color: #00529B;
+        background-color: #BDE5F8;
+    }
+
+    .isa_success {
+        color: #4F8A10;
+        background-color: #DFF2BF;
+    }
+
+    .isa_warning {
+        color: #9F6000;
+        background-color: #FEEFB3;
+    }
+
+    .isa_error {
+        color: #D8000C;
+        background-color: #FFBABA;
+    }
+
+        .isa_info i, .isa_success i, .isa_warning i, .isa_error i {
+            margin: 10px 22px;
+            font-size: 2em;
+            vertical-align: middle;
+        }
+
+    .binh {
+        /*border-color: #1ABC9C;*/
+        box-shadow: none;
+    }
+</style>
+<div class="col-sm-12">
+    <div class="panel panel-default">
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Chi tiết bình chọn</span>
+            <ul class="nav nav-tabs pull-right" role="tablist">
+                <li>
+                    <a href="/Survey/Survey"><i class="fa fa-plus-square"></i> Tạo Bình Chọn</a>
+                </li>
+                <li class="active">
+                    <a href="/Survey/ListPoll"><i class="fa fa-list-alt"></i> Danh Sách Các Bình Chọn</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel-body">
+
+            @using (Html.BeginForm("UpdateSurvey", "Survey", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+                if (alert != null)
+                {
+                    <div class="form-group">
+                        <label for="inputEmail3" class="col-sm-4 control-label"></label>
+                        <div class="col-sm-8" id="label1">
+                            @*<div class="alert alert-success" style="width: 330px">
+                                    <strong><span class="label date-color label-gray center">Tao thanh cong</span></strong>
+                                </div>*@
+                            <div class="isa_success" style="width: 330px">
+                                <i class="fa fa-check"></i>
+                                @alert
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <fieldset class="scheduler-border less-padding border-top">
+                                    <legend class="scheduler-border bold-black">Thông tin bình chọn</legend>
+                                    <div class="form-group">
+                                        <label for="inputEmail3" class="col-sm-4 control-label">Ngày bắt đầu</label>
+                                        <div class="col-sm-8">
+                                            @Html.TextBoxFor(m => m.PublishDate, new { @class = "form-control binh", onchange = "bInfos()", @Value = Convert.ToString(string.Format("{0:MM/dd/yyyy HH:mm:ss}", surveys.PublishDate)) })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inputEmail3" class="col-sm-4 control-label">Ngày kết thúc</label>
+                                        <div class="col-sm-8">
+                                            @Html.TextBoxFor(m => m.EndDate, new { @class = "form-control binh", onchange = "bInfos()", @Value = Convert.ToString(string.Format("{0:MM/dd/yyyy HH:mm:ss}", surveys.EndDate)) })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">Đối tượng</label>
+                                        <div class="col-sm-8">
+
+                                            @{if (surveys.Mode == 1)
+                                            {
+                                                <label><input type="radio" value="1" checked="checked" name="people">Tất Cả</label>
+                                                <label><input type="radio" value="2" name="people">Tất Cả Chủ Nhà</label>
+                                                <label><input type="radio" value="3" name="people">Tất Cả Cư Dân</label>
+                                            }
+                                            else if (surveys.Mode == 2)
+                                            {
+                                                <label><input type="radio" value="1" name="people">Tất Cả</label>
+                                                <label><input type="radio" value="2" checked="checked" name="people">Tất Cả Chủ Nhà</label>
+
+                                                <label><input type="radio" value="3" name="people">Tất Cả Cư Dân</label>
+
+                                            }
+                                            else if (surveys.Mode == 3)
+                                            {
+                                                <label><input type="radio" value="1" name="people">Tất Cả</label>
+                                                <label><input type="radio" value="2" name="people">Tất Cả Chủ Nhà</label>
+                                                <label><input type="radio" value="3" checked="checked" name="people">Tất Cả Cư Dân</label>
+                                            }
+
+                                            }
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">Chế độ ưu tiên</label>
+                                        <div class="col-sm-8">
+
+                                            @{if (surveys.Priority == 1)
+                                            {
+                                                <label><input type="radio" value="1" name="priority" checked="checked">Bắt buộc </label>
+                                                <label><input type="radio" value="0" name="priority">Không</label>
+                                            }
+                                            else if (surveys.Priority == 0)
+                                            {
+
+                                                <label><input type="radio" value="1" name="priority">Bắt buộc</label>
+                                                <label><input type="radio" value="0" name="priority" checked="checked">Không</label>
+                                            }
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">Trạng Thái</label>
+                                        <div class="col-sm-8">
+
+
+                                            @{if (surveys.Status == 1)
+                                            {
+                                                <label><input type="radio" value="1" name="status" checked="checked"> Mở </label>
+                                                <label><input type="radio" value="0" name="status"> Đóng</label>
+                                            }
+                                            else if (surveys.Status == 0)
+                                            {
+
+                                                <label><input type="radio" value="1" name="status"> Mở</label>
+                                                <label><input type="radio" value="0" name="status" checked="checked"> Đóng</label>
+                                            }
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="inputEmail3" class="col-sm-4 control-label">Khu</label>
+                                        <div class="col-sm-8">
+
+                                            @*<label class="checkbox-inline"><input type="checkbox" name="block" value="@item">@item</label>*@
+                                            @{
+                                            List<Block> listBlockss = blockService.GetListBlock();
+                                            List<BlockPoll> listBlocks = BlockPollService.FindByPollId(surveys.Id);
+                                            int temp = 0;
+                                            foreach (var obj in listBlockss)
+                                            {
+                                                if (temp < listBlocks.Count)
+                                                {
+                                                    if (obj.Id == listBlocks.ElementAt(temp).BlockId)
+                                                    {
+                                                        <label class="checkbox-inline"><input type="checkbox" checked="checked" name="block" value="@obj.BlockName">@obj.BlockName</label>
+                                                        temp++;
+                                                    }
+                                                    else
+                                                    {
+                                                        <label class="checkbox-inline"><input type="checkbox" name="block" value="@obj.BlockName">@obj.BlockName</label>
+                                                    }
+
+                                                }
+
+                                                else
+                                                {
+                                                    <label class="checkbox-inline"><input type="checkbox" name="block" value="@obj.BlockName">@obj.BlockName</label>
+                                                }
+                                            }
+                                            }
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <fieldset class="scheduler-border less-padding border-top">
+                                    <legend class="scheduler-border bold-black">Câu hỏi</legend>
+                                    <div class="form-group">
+                                        <label for="inputEmail3" class="col-sm-4 control-label">Câu Hỏi :</label>
+                                        <div class="col-sm-8">
+                                            <textarea rows="6" type="text" class="form-control binh" id="question" name="question">@surveys.Question</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        @{int counts = 1;
+                                        foreach (var b in answers)
+                                        {
+                                            <div class="form-group">
+                                                @if (counts == 1)
+                                                {
+                                                    <label for="inputEmail3" class="col-sm-4 control-label">Câu trả lời</label>
+                                                }
+                                                else
+                                                {
+                                                    <label for="inputEmail3" class="col-sm-4 control-label"></label>
+                                                }
+                                                @if (b != null && b != "")
+                                                {
+                                                    <div class="col-sm-8">
+                                                        @Html.TextBoxFor(m => m.Id, new { @type = "hidden", @Value = surveys.Id })
+                                                        <input type="hidden" id="@counts" name="count" value="@counts" />
+                                                        <input type="text" class="form-control binh" id="anwserr_@counts" name="anwser1" value="@b">
+                                                    </div>
+                                                    counts++;
+                                                }
+                                            </div>
+                                        }
+                                        }
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                        //int i = 0;
+                                        // int count = answers.Count;
+                                        ////}
+
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-4 col-sm-8" style="margin-top: 10px">
+                                                @*<a href="@Url.Action("UpdateSurvey", "Survey", new { PollId =@surveys.Id})" class="fa fa-list-alt">Lưu..</a>*@
+                                                <button style="margin-right: 5px" type="submit" class="btn btn-info"> <i class="fa fa-save"></i> Cập Nhật</button>
+                                                <button type="button" data-toggle="modal" data-target="#myModall" class="btn btn-info"><i class="fa fa-bar-chart"></i> Xem Thống Kê</button>
+                                                @Html.TextBoxFor(m => m.StartDate, new { @class = "form-control binh", @type = "hidden", onchange = "bInfos()", @Value = Convert.ToString(string.Format("{0:yyyy/MM/dd}", DateTime.Now)) })
+                                            </div>
+
+                                        </div>
+            }
+        </div>
+
+        @*</form>*@
+        @*//coutn answer.........*@
+        @{
+            int abc = 1;
+            foreach (var item in listAnswer)
+            {
+                <input type="hidden" id="answer_@abc" name="countAnser" value="@item" />
+                abc++;
+            }
+        }
+    </div>
+
+</div>
+<div id="myModall" style="height: auto" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header login" style="text-align: center; font-size: 42px; background-color: #99ccff">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+                <label class="label label-success">Kết quả khảo sát</label>
+
+            </div>
+            <div class="modal-body">
+                <fieldset>
+
+
+
+                    <div class="col-sm-5" style="margin-top: 20px">
+
+                        @{
+                            foreach (var obj in answers)
+                            {
+                                if (obj != null && !obj.Equals(""))
+                                {
+                                    <div id="rcorners2">
+                                        <label>@obj</label>
+
+
+                                    </div> <hr>
+                                }
+                            }
+                        }
+
+
+                    </div>
+                    <div class="col-sm-4" style="margin-top: 20px">
+                        @{
+                            foreach (var a in listAnswer)
+                            {
+                                <div id="rcorners1">
+                                    <progress value="@a" max="100">
+                                    </progress> @a %
+                                    @*<div class="progress" style="width: 100%; margin-bottom: 20px;font-size: 16px">
+                                            <div class="progress-bar"  role="progressbar" aria-valuenow="@a"
+                                                 aria-valuemin="0" aria-valuemax="100" style="width: 100%; font-size: 14px">
+                                                <div style="margin-bottom: 2px">@a%</div>
+                                            </div>
+                                        </div>*@
+                                </div><hr>
+
+                                <input type="hidden" id="answer" name="countAnser" value="@a" />
+                            }
+                        }
+                    </div>
+                    <div class="col-sm-3" style="margin-top: 20px">
+                        @{
+                            foreach (var a in listEach)
+                            {
+                                <div id="rcorners3"><label>@a Phiếu</label></div><hr>
+
+
+                            }
+                        }
+                    </div>
+                    <div class="col-sm-12" style="text-align: center"><h4>Tổng cộng:  @listEach.Sum() phiếu</h4></div>
+
+
+
+
+
+                    @*<div id="container" style="min-width: 500px; height: 400px; margin: 0 auto"></div>*@
+                </fieldset>
+            </div>
+            <div class="modal-footer" style="background-color: #99ccff"></div>
+        </div>
+    </div>
+</div>
+<script>
+    jQuery(function () {
+        var startDate;
+        var d = new Date(); d.setHours(0, 0, 0, 0);
+        var open = false;
+        $("#PublishDate").datetimepicker({
+            timepicker: true,
+            closeOnDateSelect: false,
+            closeOnTimeSelect: true,
+            initTime: true,
+            minDate: d
+        });
+        $("#EndDate").datetimepicker({
+            timepicker: true,
+            closeOnDateSelect: false,
+            closeOnTimeSelect: true,
+            initTime: true,
+            minDate: d
+        });
+
+        jQuery("#PublishDate").on("dp.change", function (e) {
+            var f = new Date(e.date); var n = new Date();
+            checkDate(jQuery('#PublishDate'), f, n);
+            jQuery('#EndDate').data("DateTimePicker").setMinDate(e.date);
+        });
+        jQuery("#EndDate").on("dp.change", function (e) {
+            var f = new Date(e.date); var n = new Date();
+            checkDate(jQuery('#PublishDate'), f, n);
+            jQuery('#PublishDate').data("DateTimePicker").setMaxDate(e.date);
+        });
+
+        var checkDate = function (obj, f, n) {
+            if (f.getTime() + 60 * 1000 < n.getTime() && !open) {
+                open = true;
+                $('#message').dialog({
+                    modal: true,
+                    position: ['center', 'center'],
+                    show: 'blind',
+                    hide: 'blind',
+                    width: 400,
+                    dialogClass: 'ui-dialog-osx',
+                    buttons: {
+                        "I understand. Let me try again": function () {
+                            $(this).dialog("close");
+                            obj.data('DateTimePicker').setDate(n);
+                            open = false;
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    function bInfos() {
+
+        b = document.getElementById('EndDate').value;
+        c = document.getElementById('PublishDate').value;
+        a = document.getElementById('StartDate').value;
+        var end = new Date(b)
+        var start = new Date(c)
+        var now = new Date(a)
+        //if (CompareDates(d1, d2, '-') == 0) {
+        //    alert('Selected date must be current date or previous date!');
+        //    return false;
+        //}
+        if (start > end) {
+            alert('Ngày đăng không hợp lệ!');
+            return false;
+        } else if (end < now) {
+            alert('Ngày kết thúc không hợp lệ!');
+            return false;
+        } else if (end < start) {
+            alert('Ngày kết thúc không hợp lệ!');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    $('#label1').delay(2500).fadeOut('slow');
+    //  $('input').attr("required", true);
+    //$(function () {
+    //    $("#StartDate").datepicker({
+    //        format: "yyyy/mm/dd",
+    //        startDate: "-3d"
+    //    });
+    //    //$("#StartDate").attr('readOnly', 'false');
+    //});
+    //$(function () {
+    //    $("#PublishDate").datepicker({
+    //        format: "mm/dd/yyyy",
+    //        startDate: "-3d"
+    //    });
+    //    //$("#PublishDate").attr('readOnly', 'false');
+    //});
+    //$(function () {
+    //    $("#EndDate").datepicker({
+    //        format: "mm/dd/yyyy",
+    //        startDate: "-3d"
+    //    });
+    //    //$("#EndDate").attr('readOnly', 'false');
+    //});
+    //var b = $("#answerr_2").val()
+    //var a = $("#answerr_1").val()
+    //var c = $("#answerr_3").val()
+    $("#questions").attr("required", true);
+    $("#answer_1").attr("required", true);
+    $("#answer_2").attr("required", true);
+
+    $("#PublishDate").attr("required", true);
+    $("#EndDate").attr("required", true);
+    var answer2 = parseFloat($("#answer_2").val()) || null;
+    var answer1 = parseFloat($("#answer_1").val()) || null;
+    var answer3 = parseFloat($("#answer_3").val()) || null;
+    var answer4 = parseFloat($("#answer_4").val()) || null;
+    var answer5 = parseFloat($("#answer_5").val()) || null;
+    var answer2a = ($("#anwserr_2").val()) || null;
+    var answer1a = ($("#anwserr_1").val()) || null;
+    var answer3a = ($("#anwserr_3").val()) || null;
+    var answer4a = ($("#anwserr_4").val()) || null;
+    var answer5a = ($("#anwserr_5").val()) || null;
+    var a = "Lựa chọn 1";
+    var b = "Lựa chọn 2";
+    var c = "Lựa chọn 3";
+    var d = "Lựa chọn 4";
+    var e = "Lựa chọn 5";
+    $(document).ready(function () {
+        //var a = document.getElementById('#answerr_1').value;
+        //var b = document.getElementById('#answerr_2').value;
+        //var c = document.getElementById('#answerr_3').value;
+        $("#PublishDate").datetimepicker();
+        $("#EndDate").datetimepicker();
+
+        if (answer1 === 0 && answer2 === 0 && answer3 === 0) {
+            //RenderPieCharts('container', [
+            //[a, null],
+            //[b, null],
+            //[c, null]
+
+            //]);
+            return '<h4>' + "Chưa có dữ liệu" + '</h4>'
+        } else {
+            RenderPieChart('container', [
+                [answer1a, answer1],
+                [answer2a, answer2],
+                [answer3a, answer3],
+                [answer4a, answer4],
+                [answer5a, answer5]
+            ]);
+        }
+
+
+        function RenderPieChart(elementId, dataList) {
+            new Highcharts.Chart({
+                chart: {
+                    renderTo: elementId,
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                },
+                title: {
+                    text: 'Biểu đồ kết quả khảo sát'
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            formatter: function () {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                            }
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        name: 'Browser share',
+                        data: dataList
+                    }
+                ]
+            });
+        };
+
+        function RenderPieCharts(elementId, dataList) {
+            new Highcharts.Chart({
+                chart: {
+                    renderTo: elementId,
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                },
+                title: {
+                    text: 'Chưa có dữ liệu'
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            formatter: function () {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                            }
+                        }
+                    }
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        name: 'Browser share',
+                        data: dataList
+                    }
+                ]
+            });
+        };
+    });
+</script>
+@*<script src="~/Scripts/jquery.datetimepicker.min.js"></script>*@

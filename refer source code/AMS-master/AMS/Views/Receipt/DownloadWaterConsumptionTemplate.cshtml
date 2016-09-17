@@ -1,0 +1,70 @@
+﻿@using AMS.Constant
+@{
+    ViewBag.Title = "DownloadWaterConsumptionTemplate";
+    Layout = "~/Views/Management/__ManagementLayout.cshtml";
+    BalanceSheet currentActiveBls = ViewBag.currentActiveBls;
+}
+
+
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Tải bảng ghi nước</span>
+
+            <ul class="nav nav-tabs pull-right" role="tablist">
+                <li>
+                    <a href="/Management/ManageReceipt/View"><i class="fa fa-file-text-o"></i> Quản lý hóa đơn</a>
+                </li>
+                <li class="">
+                    <a href="/Management/ManageReceipt/CreateManualReceiptView"><i class="fa fa-file-o"></i> Tạo hóa đơn lẻ</a>
+                </li>
+                <li class="">
+                    <a href="/Management/ManageReceipt/CreateAutomationReceiptView"><i class="fa fa-files-o"></i> Tạo hóa đơn hàng loạt</a>
+                </li>
+                <li class="active">
+                    <a href="/Management/ManageReceipt/ViewDownloadRecordTemplate"><i class="fa fa-cloud-download"></i> Tải bảng ghi nước</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane fade active in" id="">
+                    <form id="addUtilServiceForm" class="form-horizontal" role="form" method="GET" action="/Management/ManageReceipt/DownloadRecordTemplate">
+                        <div class="form-group">
+                            <label class="col-md-offset-1 col-md-2 control-label">Tiêu đề</label>
+                            <div class="col-md-6 ">
+                                <input type="text" id="publishDate" name="title" class="form-control" />
+                            </div>
+                            <button class="btn btn-info" type="submit">
+                                <i class="fa fa-cloud-download"></i> Tải về
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#addUtilServiceForm").validate({
+            rules: {
+                title: {
+                    required: true,
+                    maxlength: 255,
+                },
+            },
+            messages: {
+                title: {
+                    required: "Trường bắt buộc",
+                    maxlength: "Tối đa 255 ký tự"
+                },
+            },
+            submitHandler: function () {
+                $("#addUtilServiceForm").submit();
+            }
+        });
+    });
+</script>

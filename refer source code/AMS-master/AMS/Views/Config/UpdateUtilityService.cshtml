@@ -1,0 +1,560 @@
+﻿@using AMS.Constant
+@{
+    ViewBag.Title = "UtilityService";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    UtilServiceForHouseCat utilSrvForHouseCat = ViewBag.utilServiceForHouseCat;
+    List<HouseCategory> houseCat = ViewBag.houseCategories;
+    bool updateable = ViewBag.updateable;
+    int index = 1;
+}
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+
+        <div class="heading-tab admin">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Cập nhật phí sinh hoạt</span>
+
+            <ul class="nav nav-tabs pull-right" role="tablist">
+                <li class="">
+                    <a href="/Management/Config/UtilityService/ViewManageHouseBlock"><i class="fa fa-home"></i> Căn hộ</a>
+                </li>
+                <li class="active">
+                    <a href="/Management/Config/UtilityService/View"><i class="fa fa-usd"></i> Phí sinh họat</a>
+                </li>
+                <li class="">
+                    <a href="/Management/ManageRequestView"><i class="fa fa-wrench"></i> DV sửa chữa</a>
+                </li>
+                <li class="">
+                    <a href="/Management/BalanceSheet/ManageTransactionCatView"><i class="fa fa-tags"></i> Nhóm thu chi</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel-body">
+            <div class="tab-content">
+                <form id="addUtilServiceForm" class="form-horizontal" role="form">
+                    <div class="alert alert-info" id="createSuccessNoti" style="display: none">
+                        <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <span>Cập nhật thành công</span>
+                    </div>
+                    <div class="alert alert-danger" id="createFailedNoti" style="display: none">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                        <span>Cập nhật thất bại</span>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane fade active in" id="">
+                            @{
+                                if (utilSrvForHouseCat.Status == SLIM_CONFIG.UTILITY_SERVICE_OF_HOUSE_CAT_DISABLE)
+                                {
+                                    <div class="col-md-offset-1 col-md-10">
+                                        <div class="pull-right">
+                                            <span id="activeBtn" class="btn btn-success" onclick="activateUtilService(@utilSrvForHouseCat.Id)"><i class="fa fa-unlock"></i> Mở</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            <div class="form-group">
+                                <div class="col-md-offset-1 col-md-10">
+                                    <fieldset class="scheduler-border less-padding">
+                                        <legend class="scheduler-border bold-black">Thông tin</legend>
+                                        <div class="form-group">
+                                            <div class="col-md-2">
+                                                <div class="form-group" style="height: 34px;text-align: right;">
+                                                    <label for="serviceTypeName" class="control-label">Tên</label>
+                                                </div>
+                                                <div class="form-group" style="height: 34px;text-align: right;">
+                                                    <label for="serviceType" class="control-label">Loại dịch vụ</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="form-group">
+                                                    <div class="col-md-9">
+                                                        <input id="serviceTypeName" name="ServiceTypeName" type="text" value="@utilSrvForHouseCat.UtilityService.Name" class="form-control">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        @{
+                                                            if (utilSrvForHouseCat.Status == SLIM_CONFIG.UTILITY_SERVICE_OF_HOUSE_CAT_DISABLE)
+                                                            {
+                                                                <span id="btnClose" class="btn btn-danger btn-block">Đóng</span>
+                                                                <span id="btnOpen" class="btn btn-success btn-block hide">Mở</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span id="btnClose" class="btn btn-danger btn-block hide">Đóng</span>
+                                                                <span id="btnOpen" class="btn btn-success btn-block">Mở</span>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="col-md-5">
+                                                        @{
+                                                            if (utilSrvForHouseCat.UtilityService.Type == SLIM_CONFIG.UTILITY_SERVICE_TYPE_WATER)
+                                                            {
+                                                                <input id="serviceType" name="ServiceType" class="form-control" value="@AmsConstants.UtilityServiceWater" />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input id="serviceType" name="ServiceType" class="form-control" value="@AmsConstants.UtilityServiceFixedCost" />
+                                                            }
+                                                        }
+                                                    </div>
+                                                    @{
+                                                        if (utilSrvForHouseCat.UtilityService.Type == SLIM_CONFIG.UTILITY_SERVICE_TYPE_WATER)
+                                                        {
+                                                            <div class="col-md-7" id="houseCatRow">
+                                                                <div class="row">
+                                                                    <label for="houseCat" class="col-md-4 control-label">Dạng cư trú</label>
+                                                                    <div for class="col-md-8">
+
+                                                                        @foreach (var cat in houseCat)
+                                                                        {
+                                                                            if (cat.Id == utilSrvForHouseCat.HouseCatId)
+                                                                            {
+                                                                                <input id="houseCat" name="ServiceType" class="form-control" value="@cat.Name" />
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            @{if (utilSrvForHouseCat.UtilityService.Type == SLIM_CONFIG.UTILITY_SERVICE_TYPE_WATER)
+                            {
+                                <div class="form-group" id="UtilityServiceWrapper">
+                                    <div class="col-md-offset-1 col-md-10">
+                                        <fieldset class="scheduler-border less-padding">
+                                            <legend class="scheduler-border bold-black">Khung giá nước</legend>
+
+                                            <div>
+                                                <div class="form-group">
+                                                    <div class="col-md-offset-1 col-md-4">
+                                                        <strong style="align-content: center">Tên mức</strong>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <strong style="align-content: center">Từ</strong>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <strong style="align-content: center">Đến <span style="font-size: 11px;font-weight: normal;">(*vô hạn)</span></strong>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <strong style="align-content: center">Giá</strong>
+                                                    </div>
+                                                </div>
+                                                <div id="waterRangeWrapperInline">
+
+                                                    @{foreach (var rangePrice in utilSrvForHouseCat.UtilityService.UtilityServiceRangePrices.ToList())
+                                                    {
+                                                        <div id="row_@index" class="form-group">
+                                                            <div class="col-md-offset-1 col-md-4">
+                                                                <input id="range_name_@index" name="RangeName" type="text" class="form-control order-item" value="@rangePrice.Name">
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <input id="from_amount_@index" name="RangeFrom" readonly="readonly" type="text" class="form-control order-item-qty" value="@rangePrice.FromAmount">
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <input id="to_amount_@index" name="RangeTo" type="text" class="form-control order-item-price"
+                                                                       value="@(rangePrice.ToAmount.Value == (SLIM_CONFIG.MAX_NUMBER) ? "*" : rangePrice.ToAmount.Value.ToString())">
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <input id="price_@index" name="RangePrice" type="text" class="form-control total-order"
+                                                                       value="@(rangePrice.Price.Value.ToString("N0"))">
+                                                            </div>
+                                                            <span class="btn btn-danger btn-xs on-delete"><i class="fa fa-times"></i></span>
+                                                            <input type="hidden" id="range_price_id_@index" name="rangePriceId" value="@rangePrice.Id" />
+                                                        </div>
+                                                        {
+                                                            index++;
+                                                        }
+                                                    }
+                                                    }
+
+                                                </div>
+                                                <input type="hidden" id="utilSrvForHouseCatId" value="@utilSrvForHouseCat.Id">
+                                                <input type="hidden" id="utilSrvCat" value="@utilSrvForHouseCat.UtilityService.Type" />
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-3">
+                                                    <span id="addRowWater" class="btn btn-stroke btn-primary"><i class="fa fa-plus"></i> Thêm</span>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            }
+                            else if (utilSrvForHouseCat.UtilityService.Type == SLIM_CONFIG.UTILITY_SERVICE_TYPE_FIXED_COST)
+                            {
+                                <div class="form-group" id="UtilityServiceWrapper">
+                                    <div class="col-md-offset-1 col-md-10">
+                                        <fieldset class="scheduler-border less-padding">
+                                            <legend class="scheduler-border bold-black">Phí cố định</legend>
+                                            <div class="form-group">
+                                                <div class="col-md-offset-2 col-md-6">
+                                                    <strong style="align-content: center">Tên phí cố định</strong>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <strong style="align-content: center">Giá</strong>
+                                                </div>
+                                            </div>
+                                            <div id="fixedCostWrapper">
+                                                <div id="row_1" class="form-group">
+                                                    <div class="col-md-offset-2 col-md-7">
+                                                        <input id="fixed_cost_name_1" name="FixCostName" value="@utilSrvForHouseCat.UtilityService.Name" type="text" class="form-control order-item">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input id="fixed_cost_price_1" name="FixCosPrice" value="@utilSrvForHouseCat.UtilityService.UtilityServiceRangePrices.ToList().First().Price.Value.ToString("N0")"
+                                                               type="text" class="form-control order-item-qty">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" id="fixedCostUtilSrvId" value="@utilSrvForHouseCat.UtilityService.Id" />
+                                            <input type="hidden" id="utilSrvCat" value="@utilSrvForHouseCat.UtilityService.Type" />
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            }
+                            }
+
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <div class="pull-right">
+                                        @{
+                                            if (updateable)
+                                            {
+                                                <button type="submit" id="btn-update" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Cập nhật</button>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="fixedCostFrame" class="hide">
+
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        window.index = @(index++);
+        onClickAddNewRow();
+        bindingEventOnDelet();
+        window.deleteRangePrice = [];
+
+        $("#serviceType").on("change", function () {
+            var selected = parseInt($("#serviceType").find("option:selected").val(), 10);
+            if (selected === 5) {
+                $("#houseCatRow").addClass("hide");
+                $("#UtilityServiceWrapper").html($("#fixedCostFrame").html());
+                $("#fixedCostWrapper").prop("id", "fixedCostWrapperInline");
+            } else if (selected === 2 || selected === 1) {
+                getListHouseCategory();
+                $("#UtilityServiceWrapper").html($("#waterFrame").html());
+                $("#waterRangeWrapper").prop("id", "waterRangeWrapperInline");
+                window.index = 3;
+                onClickAddNewRow();
+            }
+            bindingEventOnDelet();
+        });
+        onChangeFromNumber();
+        bindingClassNumberWithComma("total-order");
+        validCreateUtilityService();
+    });
+    function onDeleteRow(event) {
+        event.stopPropagation();
+        console.log($(event));
+        var thisNode = event.currentTarget;
+        var fieldSetRow = thisNode.parentNode.parentNode.children.length;
+        if (fieldSetRow > 1) {
+            var deleteItemId = thisNode.parentNode.querySelector("input[name='rangePriceId'").value;
+            if (deleteItemId != 0) {
+                window.deleteRangePrice.push(deleteItemId);
+            }
+            thisNode.parentNode.parentNode.removeChild(thisNode.parentNode);
+            //            window.deleteRangePrice
+        }
+        event.stopPropagation();
+        $("#addUtilServiceForm").closest("form").find("input[type=text].order-item-qty:first").val("0");
+    }
+    function bindingEventOnDelet() {
+        $(".on-delete").unbind();
+        $(".on-delete").on("click", function (event) {
+            onDeleteRow(event);
+        });
+    }
+    function onClickAddNewRow() {
+        $("#addRowWater").unbind();
+        $("#addRowWater").on("click", function () {
+            createNewRow("waterRangeWrapperInline");
+        });
+    }
+    function createNewRow(wrapperId) {
+        window.index++;
+        addRangePrice(index, wrapperId);
+        bindingEventOnDelet();
+        onChangeFromNumber();
+        bindingClassNumberWithComma("total-order");
+    }
+    function createNewFixedCostRow(wrapperId) {
+        window.index++;
+        addNewFixedCostRow(index, wrapperId);
+        bindingEventOnDelet();
+    }
+    function getListHouseCategory() {
+        $.ajax({
+            url: "/Management/Config/UtilityService/GetListHouseType",
+            type: "GET",
+            success: function (data) {
+                $("#houseCat").html(parseJsonToSelectTags(data));
+                $("#houseCatRow").removeClass("hide");
+            }
+        });
+    }
+    function addRangePrice(index, parentTagId) {
+        var tag = "<div id=\"row_" + index + "\" class='form-group'>" +
+                "<div class='col-md-offset-1 col-md-4'><input id=\"range_name_" + index + "\" type='text' name='RangeName' class='form-control order-item'></div>" +
+                "<div class='col-sm-2'><input  readonly='readonly' type='text' id=\"from_amount_" + index + "\" name='RangeFrom'  class='form-control order-item-qty'></div>" +
+                "<div class='col-sm-2'><input id=\"to_amount_" + index + "\"type='text' name='RangeTo'class='form-control order-item-price'></div>" +
+                "<div class='col-sm-2'><input id=\"price_" + index + "\" type='text' name='RangePrice'class='form-control total-order'></div>" +
+                "<span class='btn btn-danger btn-xs on-delete'><i class='fa fa-times'></i></span>" +
+                "<input type='hidden' id='range_price_id_" + index + "' name='rangePriceId' value='0'/>"+
+                "</div>";
+        $("#" + parentTagId).append(tag);
+    }
+    function addNewFixedCostRow(index, parentTagId) {
+        var tag = "<div id='row_" + index + "' class='form-group'>" +
+                    " <div class='col-md-offset-2 col-md-7'>" +
+                    " <input id='fixed_cost_name_" + index + "' name='' type='text' class='form-control order-item'>" +
+                    "</div>" +
+                    "  <div class='col-md-2'>" +
+                    "  <input id='fixed_cost_price_" + index + "' name='' type='text' class='form-control order-item-qty'>" +
+                    "    </div>" +
+                    "   <span class='btn btn-danger btn-xs on-delete'><i class='fa fa-times'></i></span>" +
+                    "  </div>";
+        $("#" + parentTagId).append(tag);
+    }
+
+    function updateUtilServicePrice(mode) {
+        if (mode === 1 || mode === 2) {
+            var utilityServiceName = $("#serviceTypeName").val();
+            var utilSrvForHouseCatId = $("#utilSrvForHouseCatId").val();
+            var houseCategory = $("#houseCat").val();
+
+            var price = 0;
+            var toAmount = 0;
+            var fromAmount = 0;
+            var rangeName = 0;
+            var id = 0;
+            var rowIdStr = [];
+            var item = {};
+            var waterRangePrices = [];
+            var rangePriceId = [];
+
+            var waterRangeElement = $("#waterRangeWrapperInline > .form-group");
+            var numberOfRow = waterRangeElement.length;
+            var thisElement = {};
+
+            for (var i = 0; i < numberOfRow; i++) {
+                thisElement = $(waterRangeElement[i]);
+                rowIdStr = thisElement.prop("id").split("row_");
+                id = rowIdStr[1];
+                rangeName = thisElement.find("#range_name_" + id).val();
+                fromAmount = replaceCommaNumber(thisElement.find("#from_amount_" + id).val());
+                toAmount = replaceCommaNumber(thisElement.find("#to_amount_" + id).val());
+                price = replaceCommaNumber(thisElement.find("#price_" + id).val());
+                rangePriceId = replaceCommaNumber(thisElement.find("#range_price_id_" + id).val());
+
+                if (rangeName && fromAmount && toAmount && price) {
+                    item = {
+                        Name: rangeName,
+                        FromAmount: fromAmount,
+                        ToAmount: toAmount,
+                        Id: rangePriceId,
+                        Price: price
+                    };
+                    waterRangePrices.push(item);
+                }
+            }
+            var waterUtilService = {
+                Name: utilityServiceName,
+                UtilServiceForHouseCatId: utilSrvForHouseCatId,
+                HouseCatId: houseCategory,
+                DeletedRangePrices: window.deleteRangePrice,
+                WaterUtilServiceRangePrices: waterRangePrices
+            };
+            $.ajax({
+                url: "/Management/Config/UtilityService/UpdateUtilServiceForHouseCat",
+                data: waterUtilService,
+                type: "POST",
+                success: function (data) {
+                    if (data.StatusCode === 0) {
+                        $("#createSuccessNoti").fadeIn("fast");
+                        window.deleteRangePrice = new Array();
+                        setTimeout(function () {
+                            $("#createSuccessNoti").fadeOut("fast");
+                        }, 3000);
+                    } else {
+                        $("#createFailedNoti").fadeIn("fast");
+                        setTimeout(function () {
+                            $("#createFailedNoti").fadeOut("fast");
+                        }, 3000);
+                    }
+                }
+            });
+        }
+        else if (mode === 5) {
+            var fixedCostElement = $("#fixedCostWrapper > .form-group");
+            var numberOfRow = fixedCostElement.length;
+            var utilityServiceName = $("#serviceTypeName").val();
+            var id = $("#fixedCostUtilSrvId").val();
+
+            var _rowIdStr = $(fixedCostElement[0]).prop("id").split("row_");
+            var _id = _rowIdStr[1];
+            var fixedCostName = $("#fixed_cost_name_" + _id).val();
+            var fixedPrice = replaceCommaNumber($("#fixed_cost_price_" + _id).val());
+            if (fixedCostName && fixedPrice) {
+                var fixCostItem = {
+                    Name: utilityServiceName,
+                    Id: id,
+                    FixedCost:  {
+                        Name: fixedCostName,
+                        Price: fixedPrice
+                    }
+                };
+                $.ajax({
+                    url: "/Management/Config/UtilityService/UpdateFixedCost",
+                    data: fixCostItem,
+                    type: "POST",
+                    success: function (data) {
+                        if (data.StatusCode === 0) {
+                            $("#createSuccessNoti").fadeIn("fast");
+                            setTimeout(function () {
+                                $("#createSuccessNoti").fadeOut("fast");
+                            }, 3000);
+                        } else {
+                            $("#createFailedNoti").fadeIn("fast");
+                            setTimeout(function () {
+                                $("#createFailedNoti").fadeOut("fast");
+                            }, 3000);
+                        }
+                    }
+                });
+            }
+        }
+    }
+    function activateUtilService(id) {
+        $.ajax({
+            url: "/Management/Config/UtilityService/ActivateUtilServices",
+            data: {
+                id: id
+            },
+            type:"POST",
+            success:function(data) {
+                if (data.StatusCode === 0) {
+                    $("#createSuccessNoti").fadeIn("fast");
+                    $("#activeBtn").addClass("hide");
+                    $("#btnClose").addClass("hide");
+                    $("#btnOpen").removeClass("hide");
+                    setTimeout(function() {
+                        $("#createSuccessNoti").fadeOut("fast");
+                    },3000);
+                } else {
+                    $("#createFailedNoti").fadeIn("fast");
+                    setTimeout(function() {
+                        $("#createFailedNoti").fadeOut("fast");
+                    },3000);
+                }
+            }
+        });
+    }
+    function validCreateUtilityService() {
+        $.validator.methods.number = function(value, element){
+            return this.optional(element) || /^-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[\.,]\d+)?$/.test(value);
+        };
+        jQuery.validator.addMethod("lastUnlimitedElement", function(value, element) {
+            var lastElement = $("#waterRangeWrapperInline >div.form-group:last-child input[name=RangeTo]");
+            var lastElemetnId = lastElement.prop("id");
+            var lastElemetnValue = lastElement.val();
+            if (lastElemetnId && lastElemetnValue !== "*" && lastElemetnId == element.id) {
+                return false;
+            }
+            return this.optional(element) || true;
+        }, "Giá trị cuối cùng là *(vô hạn)");
+        $("#addUtilServiceForm").validate({
+            rules: {
+                ServiceTypeName: {
+                    required: true,
+                    maxlength:255
+                },
+                RangeName: {
+                    required: true,
+                    maxlength:255
+                },
+                RangeTo: {
+                    required: true,
+                    lastUnlimitedElement: true,
+                },
+                RangePrice: {
+                    required: true,
+                    number: true,
+                },
+                FixCostName: {
+                    required: true,
+                    maxlength:255
+                },
+                FixCosPrice: {
+                    required: true,
+                    number: true,
+                }
+            },
+            messages: {
+                ServiceTypeName: {
+                    required: "Trường bắt buộc",
+                    maxlength: "Tối đa 255 ký tự."
+                },
+                RangeName: {
+                    required: "Trường bắt buộc",
+                    maxlength: "Tối đa 255 ký tự."
+                },
+                RangeTo: {
+                    required: "Trường bắt buộc",
+                    number: "Phải là kí số"
+                },
+                RangePrice: {
+                    required: "Trường bắt buộc",
+                    number: "Phải là kí số"
+                },
+                FixCostName: {
+                    required: "Trường bắt buộc"
+                },
+                FixCosPrice: {
+                    required: "Trường bắt buộc",
+                    number: "Phải là kí số"
+                }
+            },
+            submitHandler: function () {
+                var utilSrvCat = $("#utilSrvCat").val();
+                updateUtilServicePrice(parseInt(utilSrvCat));
+            }
+        });
+
+        //        $.validator.messages.required = 'File name mandatory!';
+        //        $.validator.messages.number = 'File name mandatory!';
+        //        $.validator.messages.maxlength = 'File name mandatory!';
+
+    }
+</script>

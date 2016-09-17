@@ -1,0 +1,73 @@
+﻿@using AMS.ViewModel
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log in";
+}
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- App Styling Bundle -->
+    <link href="~/Content/css/default.min.css" rel="stylesheet">
+
+    <style>
+        .error-login-msg > ul > li {
+            list-style: none !important;
+        }
+
+        .error-login-msg > ul {
+            padding: 0;
+        }
+    </style>
+</head>
+@*<body class="login" style="background:url(/Content/images/lock-1.jpg)">*@
+<body class="login" style="background:#25ad9f">
+    <div id="content">
+        <div class="container-fluid">
+            <div class="lock-container" style="width: 350px">
+                @*                <h1>AMS</h1>*@
+                <div style="margin-bottom: 15px;">
+                    <img src="/Content/images/logo.png" style="width: 100%;">
+                </div>
+                <div class="panel panel-default text-center" style="max-width: 350px !important;box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);border-radius: 3px;">
+                    <h4 style="margin: 10px auto; width:90%"> Hãy đăng nhập để sử dụng hệ thống</h4>
+                    <img src="~/Content/images/defaultProfile.png" class="img-circle" style="max-width: 100px; border: 3px solid #bdbdbd; box-shadow: 0 0 1px 0px #bdbdbd inset, 0 0 1px 0px #bdbdbd;">
+                                        <div class="panel-body">
+                        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger error-login-msg" })
+                            @Html.TextBoxFor(m => m.username, new { @class = "form-control", @placeholder = "Tên đăng nhập" })
+                            @Html.ValidationMessageFor(m => m.username, "", new { @class = "text-danger" })
+                            @Html.PasswordFor(m => m.password, new { @class = "form-control", @placeholder = "Mật khẩu" })
+                            @Html.ValidationMessageFor(m => m.password, "", new { @class = "text-danger" })
+                            <input type="submit" value="Đăng nhập" class="btn btn-primary" />
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Vendor Scripts Bundle -->
+    <script src="js/vendor.min.js"></script>
+
+    <!-- App Scripts Bundle -->
+    <script src="js/scripts.min.js"></script>
+</body>
+
+
+</html>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

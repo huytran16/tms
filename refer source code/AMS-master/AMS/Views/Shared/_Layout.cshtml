@@ -1,0 +1,162 @@
+﻿@using Microsoft.AspNet.Identity;
+@using AMS.Service;
+@{
+    var currentUser = User.Identity;
+    String url = HttpContext.Current.Request.Url.AbsolutePath;
+    UserService userService = new UserService();
+    User curUser = userService.findById(int.Parse(User.Identity.GetUserId()));
+    String profile = "/Content/images/defaultProfile.png";
+    if (curUser != null && curUser.ProfileImage != null && !curUser.ProfileImage.Equals(""))
+    {
+        profile = curUser.ProfileImage;
+    }
+    bool isResidentOrHouseOwner = curUser.RoleId == SLIM_CONFIG.USER_ROLE_RESIDENT || curUser.RoleId == SLIM_CONFIG.USER_ROLE_HOUSEHOLDER;
+    bool isManager = (curUser.RoleId == SLIM_CONFIG.USER_ROLE_MANAGER);
+    bool isAdmin = (curUser.RoleId == SLIM_CONFIG.USER_ROLE_ADMIN);
+    bool isSupporter = (curUser.RoleId == SLIM_CONFIG.USER_ROLE_SUPPORTER);
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Scripts.Render("~/bundles/jquery")
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/css/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <script src="~/Scripts/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="~/Content/css/jquery-ui.min.css">
+    <link rel="stylesheet" href="~/Content/css/dataTables.bootstrap.min.css">
+    <link href="~/Content/css/jquery.datetimepicker.css" rel="stylesheet" />
+
+
+</head>
+
+<body class="breakpoint-1024" style="overflow-x: hidden">
+    <div class="navbar navbar-main navbar-primary navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a href="#" data-toggle="sidebar-menu" id="toggle-sidebar-menu" class="visible-xs"><i class="fa fa-ellipsis-v"></i></a>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-nav">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @*<a data-toggle="sidebar-chat" class="btn btn-link navbar-btn visible-xs"><i class="fa fa-comments"></i></a>*@
+
+                <a class="navbar-brand" href="/">
+                    <img src="~/Content/images/logo.png" style="height: 55px; margin-top: -17px; margin-bottom: -20px;" />
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="navbar-collapse collapse" id="main-nav" style="height: 1px;">
+                <ul class="nav navbar-nav" style="margin-left: 10px;">
+                    <li style="@(url.Equals("/") || url.Equals("/Home") || url.Equals("/Home/Index") ? "background-color:#21988c" : "")">
+                        <a href="/">
+                            <i class="fa fa-fw fa-users"></i> Mạng xã hội
+                        </a>
+                    </li>
+
+                    @*                    @if (isResidentOrHouseOwner)*@
+                    @*                    {*@
+                    @*                        <li style="@(url.Contains("/AroundService/") ? "background-color:#21988c" : "")">*@
+                    @*                            <a href="/Home/AroundService/ListView"><i class="fa fa-fw fa-stumbleupon-circle"></i> Dịch vụ xung quanh</a>*@
+                    @*                        </li>*@
+                    @*                        <li>*@
+                    @*                            <a href="/Survey/doSurvey"><i class="fa fa-check-square-o"></i> Khảo sát</a>*@
+                    @*                        </li>*@
+                    @*                    }*@
+
+                    <li style="@(url.Contains("/AroundService/") ? "background-color:#21988c" : "")">
+                        <a href="/Home/AroundService/All"><i class="fa fa-fw fa-street-view"></i> Dịch vụ xung quanh</a>
+                    </li>
+                    <li style="@(url.Contains("/Survey/") ? "background-color:#21988c" : "")">
+                        <a href="/Survey/doSurvey"><i class="fa fa-check-square-o"></i> Khảo sát</a>
+                    </li>
+
+                    @if (isManager)
+                    {
+                        <li style="background-color: #428bca">
+                            <a href="/Management/HelpdeskRequest/ManageHdRequest"><i class="fa fa-fw fa-black-tie"></i> Quản lý</a>
+                        </li>
+                    }
+                    @if (isAdmin)
+                    {
+                        <li style="background-color: #465665">
+                            <a href="/Management/Config/UtilityService/ViewManageHouseBlock"><i class="fa fa-fw fa-black-tie"></i> Quản lý</a>
+                        </li>
+                    }
+                    @if (isSupporter)
+                    {
+                        <li style="background-color: #388e3c">
+                            <a href="/HelpdeskSupporter"><i class="fa fa-fw fa-wrench"></i> Sửa chữa</a>
+                        </li>
+                    }
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <!-- User -->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle user truncate" data-toggle="dropdown">
+                            <img src="@profile" onerror="this.onerror = null; this.src = '/Content/images/defaultProfile.png'; " alt="User name" class="img-circle" height="40">@(curUser == null ? "Chưa đăng nhập" : curUser.Fullname) <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a href="/Home/ViewProfile">Thông tin cá nhân</a>
+                            </li>
+                            <li>
+                                <a href="/Account/LogOff">Đăng xuất</a>
+                            </li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    @if (Request.Url.PathAndQuery == "/" || url.Contains("/House/") || url.Contains("/Home/") || url.Contains("/Home/Index"))
+    {
+        <header class="cover overlay">
+            <img src="/Content/images/banner-842.jpg" alt="cover">
+        </header>
+    }
+
+    <div class="st-container" style="margin-left: auto; margin-right: auto">
+        <div class="row" style="margin: 0;padding-left: 15px;padding-right: 15px;">
+            @RenderBody()
+            <hr />
+        </div>
+    </div>
+
+
+    @*@Scripts.Render("~/bundles/bootstrap")*@
+    <script src="~/Scripts/amsScript/vendor.js"></script>
+    <script src="~/Scripts/amsScript/scripts.js"></script>
+    <script src="~/Scripts/amsScript/custom.js"></script>
+    <script src="~/Scripts/amsScript/jquery.validate.js"></script>
+    <script src="~/Scripts/amsScript/additional-methods.js"></script>
+    <script src="~/Scripts/amsScript/jquery.timepicker.min.js"></script>
+    <script src="~/Scripts/jquery.datetimepicker.full.js"></script>
+    <script src="~/Scripts/aroundProvider/jquery.sticky.js"></script>
+    <script src="~/Scripts/aroundProvider/jquery.nav.js"></script>
+    <script src="~/Scripts/aroundProvider/plugins.js"></script>
+    <script src="~/Scripts/aroundProvider/wow.min.js"></script>
+    <script src="~/Scripts/aroundProvider/jquery.mixitup.js"></script>
+
+    <script src="~/Scripts/amsScript/jquery.mousewheel.min.js"></script>
+    <script src="~/Scripts/amsScript/lightgallery.js"></script>
+    <script src="~/Scripts/amsScript/lg-thumbnail.js"></script>
+    <script src="~/Scripts/amsScript/lg-fullscreen.js"></script>
+    <script src="~/Scripts/amsScript/SocialMediaCustom.js"></script>
+
+    <script src="~/Scripts/amsScript/jquery.raty.js"></script>
+
+    @RenderSection("scripts", required: false)
+
+</body>
+
+</html>

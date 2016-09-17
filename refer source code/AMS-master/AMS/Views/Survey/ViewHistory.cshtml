@@ -1,0 +1,424 @@
+﻿@using AMS.ViewModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "ViewHistory";
+    Layout = "~/Views/Home/_socialNetworkLayout.cshtml";
+    List<SurveyViewModel> list = ViewBag.List;
+    List<List<Double>> listAnswer = ViewBag.ListCount;
+    List<List<string>> answers = ViewBag.Answer;
+    List<List<Double>> each = ViewBag.Each;
+    int count = ViewBag.Count;
+}
+<style>
+    #rcorners2 {
+        border: 2px solid #73AD21;
+        height: 50px;
+        width: auto;
+    }
+
+    #rcorners3 {
+        height: 50px;
+    }
+
+    #rcorners1 {
+        height: 50px;
+    }
+</style>
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Bình chọn</span>
+            <ul class="nav nav-tabs pull-right" role="tablist">
+
+                <li class="active">
+                    <a href=""><i class="fa fa-history"></i> Bình chọn đã làm </a>
+                </li>
+
+                <li>
+                    <a href="/Survey/DoSurvey"><i class="fa fa-book"></i>Danh sách bình chọn <span class="badge">@count</span> </a>
+                </li>
+
+
+
+            </ul>
+        </div>
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane fade active in" id="">
+                    <table id="myTables" class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>Câu hỏi</th>
+                                <th>Lựa chọn</th>
+                                <th>Ngày trả lời</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>Câu hỏi</th>
+                                <th>Lựa chọn</th>
+                                <th>Ngày trả lời</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            @{
+                                int i = 0;
+                                foreach (var item in list)
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><img class="img-responsive" width="100px" src="@item.ImageUrl"></td>
+                                        <td>
+                                            @item.Question
+                                        </td>
+                                        <td>
+                                            @item.AnswerContent
+
+                                        </td>
+                                        <td><strong>@Convert.ToString(string.Format("{0:dd/MM/yyyy}", item.AnswerDate))</strong></td>
+                                        <td>
+                                            <span class="btn btn-default btn-xs" onclick="showReportModal(@i)"> <i class="fa fa-newspaper-o"><b>Thống Kê</b></i> </span>
+
+                                        </td>
+                                    </tr>
+
+                                    i++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    @{
+                        i = 0;
+                        int k = 0;
+                        foreach (var item in list)
+                        {
+                            <div id="myModall_@i" class="modal fade">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header login">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h3 id="hdSrvCateModalTitle" class="modal-title"><i class="fa fa-info-circle"></i> Kết quả khảo sát</h3>
+                                        </div>
+                                        <div class="modal-body" style="padding-bottom: 0;">
+                                            <fieldset >
+                                                <div class="col-sm-5" style="margin-top: 20px">
+
+                                                    @{foreach (var obj in answers.ElementAt(k))
+                                                    {
+                                                        if (obj != null && !obj.Equals(""))
+                                                        {
+                                                            <div id="rcorners2">
+                                                                <label style="padding: 5px; text-align: center">@obj</label>
+
+                                                                <br />
+                                                            </div>
+                                                            <hr>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div id="rcorners2" style="visibility: hidden;">
+                                                                <label style="padding: 5px; text-align: center"></label>
+
+                                                                <br />
+                                                            </div>
+                                                            <hr>
+                                                        }
+
+                                                    }
+                                                    }
+
+
+                                                </div>
+                                                <div class="col-sm-4" style="margin-top: 20px">
+
+                                                    @{foreach (var a in listAnswer.ElementAt(k))
+                                                    {
+                                                        if (a != 0)
+                                                        {
+                                                            <div id="rcorners1">
+                                                                <progress value="@a" max="100">
+                                                                </progress> @a %
+
+                                                            </div>
+                                                            <hr>
+
+                                                            <input type="hidden" id="answer" name="countAnser" value="@a" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <div id="rcorners1" style="visibility: hidden;">
+                                                                <progress value="0" max="100">
+                                                                </progress> 0 %
+
+                                                            </div>
+                                                            <hr>
+
+                                                            <input type="hidden" id="answer" name="countAnser" value="0" />
+                                                        }
+                                                    }
+                                                    }
+                                                </div>
+                                                <div class="col-sm-3" style="margin-top: 20px">
+
+                                                    @{foreach (var a in each.ElementAt(k))
+                                                    {
+                                                        if (a != 0)
+                                                        {
+                                                            <div id="rcorners3">
+                                                                <label>@a Phiếu </label><br />
+                                                            </div>
+                                                            <hr>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div id="rcorners3" style="visibility: hidden;">
+                                                                <label>0 Phiếu </label><br />
+                                                            </div>
+                                                            <hr>
+                                                        }
+                                                    }
+                                                    }
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <div class="pull-left">
+                                                <label style="font-size: 19px;">Tổng lượt bình chọn</label>: <span style="font-size: 26px;font-weight: bolder;"> @each.ElementAt(k).Sum()</span>  <span style="font-size: 19px;"> (phiếu)</span>
+                                            </div>
+                                            <div class="pull-right">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                                    k++;
+                                                    i++;
+                        }
+
+
+                    }
+                    @{int abc = 1;
+                    foreach (var item in listAnswer)
+                    {
+                        <input type="hidden" id="answer_@abc" name="countAnser" value="@item" />
+                        abc++;
+                    }
+                    }
+                    @{
+
+
+                        int counts = 1;
+
+                        foreach (var b in answers)
+                        {
+                            if (b != null)
+                            {
+
+                                <div class="col-md-8">
+                                    <input type="hidden" disabled="disabled" class="form-control binh" @*style="width: 230px"*@ id="@counts" name="anwser1" value="@b"><br />
+                                </div>
+                                counts++;
+                            }
+
+                        }
+
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var answer2 = parseFloat($("#answer_2").val()) || null;
+    var answer1 = parseFloat($("#answer_1").val()) || null;
+    var answer3 = parseFloat($("#answer_3").val()) || null;
+    var answer4 = parseFloat($("#answer_4").val()) || null;
+    var answer5 = parseFloat($("#answer_5").val()) || null;
+    var answer2a = ($("#2").val()) || null;
+    var answer1a = ($("#1").val()) || null;
+    var answer3a = ($("#3").val()) || null;
+    var answer4a = ($("#4").val()) || null;
+    var answer5a = ($("#5").val()) || null;
+    var a = "Lựa chọn 1";
+    var b = "Lựa chọn 2";
+    var c = "Lựa chọn 3";
+    var d = "Lựa chọn 4";
+    var e = "Lựa chọn 5";
+    $(document).ready(function () {
+        window.myTables = $("#myTables").DataTable({
+            "bLengthChange": false,
+            "bInfo": false,
+        });
+        generateTableIndex(window.myTables);
+
+        //var a = document.getElementById('#answerr_1').value;
+        //var b = document.getElementById('#answerr_2').value;
+        //var c = document.getElementById('#answerr_3').value;
+
+        if (answer1 === 0 && answer2 === 0 && answer3 === 0) {
+            //RenderPieCharts('container', [
+            //[a, null],
+            //[b, null],
+            //[c, null]
+
+            //]);
+            return '<h4>' + "Chưa có dữ liệu" + '</h4>';
+        } else if (answer3a == null) {
+            RenderPieChart('container', [
+            [answer1a, answer1],
+            [answer2a, answer2],
+              [answer4a, answer4],
+                [answer5a, answer5]
+            ]);
+        } else if (answer4a == null) {
+            RenderPieChart('container', [
+           [answer1a, answer1],
+           [answer2a, answer2],
+               [answer3a, answer3],
+               [answer5a, answer5]
+            ]);
+        } else if (answer5a == null) {
+            RenderPieChart('container', [
+           [answer1a, answer1],
+           [answer2a, answer2],
+               [answer3a, answer3],
+             [answer4a, answer4],
+            ]);
+        } else if (answer4a === null && answer3a === null && answer5a === null) {
+            RenderPieChart('container', [
+           [answer1a, answer1],
+           [answer2a, answer2],
+               [answer3a, answer3],
+            ]);
+        }
+        else
+        {
+            RenderPieChart('container', [
+           [answer1a, answer1],
+           [answer2a, answer2],
+               [answer3a, answer3],
+             [answer4a, answer4],
+               [answer5a, answer5]
+
+            ]);
+        }
+
+
+
+        function RenderPieChart(elementId, dataList) {
+            new Highcharts.Chart({
+                chart: {
+                    renderTo: elementId,
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                }, title: {
+                    //text: '<span class="label">Biểu đồ kết quả khảo sát</span>'
+                    text: null,
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            formatter: function () {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                            }
+                        },
+
+
+
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    colorByPoint: true,
+                    name: 'Browser share',
+                    //data: dataList
+                    data: [{
+                        name: answer1a,
+                        y: answer1
+                    }, {
+                        name: answer2a,
+                        y: answer2,
+                        sliced: true,
+                        selected: true
+                    }, {
+                        name: answer3a,
+                        y: answer3
+                    }, {
+                        name: answer4a,
+                        y: answer4
+                    }, {
+                        name: answer5a,
+                        y: answer5
+
+                    }]
+                }]
+            });
+        };
+
+        function RenderPieCharts(elementId, dataList) {
+            new Highcharts.Chart({
+                chart: {
+                    renderTo: elementId,
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                }, title: {
+                    text: 'Chưa có dữ liệu'
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            formatter: function () {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    name: 'Browser share',
+                    data: dataList
+                }]
+            });
+        };
+    });
+    function showReportModal(index) {
+        $("#myModall_" + index + " > div > div > div.modal-body > fieldset > div.col-sm-5 > hr:nth-child(10)").remove();
+        $("#myModall_" + index + " > div > div > div.modal-body > fieldset > div.col-sm-4 > hr:nth-child(14)").remove();
+        $("#myModall_" + index + " > div > div > div.modal-body > fieldset > div.col-sm-3 > hr:nth-child(10)").remove();
+        $("#myModall_" + index).modal("show");
+    }
+</script>
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/amsScript/canvasjs.min.js"></script>

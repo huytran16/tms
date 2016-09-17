@@ -1,0 +1,284 @@
+﻿@using AMS.Constant
+@using Microsoft.AspNet.Identity
+<script src="~/Scripts/Chart.min.js"></script>
+<script src="~/Scripts/amsScript/moment.min.js"></script>
+@{
+    ViewBag.Title = "HouseExpenseStatus";
+    Layout = "~/Views/Home/_socialNetworkLayout.cshtml";
+    List<Receipt> receipts = ViewBag.receipts;
+}
+
+@*<nav class="navbar navbar-subnav navbar-static-top" role="navigation">*@
+@*    <div class="container-fluid">*@
+@**@
+@*        <!-- Brand and toggle get grouped for better mobile display -->*@
+@*        <div class="navbar-header">*@
+@*            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#subnav">*@
+@*                <span class="sr-only">Toggle navigation</span>*@
+@*                <span class="fa fa-ellipsis-h"></span>*@
+@*            </button>*@
+@*        </div>*@
+@**@
+@*        <!-- Collect the nav links, forms, and other content for toggling -->*@
+@*        <div class="collapse navbar-collapse" id="subnav">*@
+@*            <ul class="nav navbar-nav">*@
+@*                <li class="active">*@
+@*                    <a href="/Home/ManageReceipt/View/HouseExpenseStatus"><i class="fa fa-file-text-o"></i> Khoản thu</a>*@
+@*                </li>*@
+@*                <li class="">*@
+@*                    <a href="/Home/ManageReceipt/View/@User.Identity.GetUserId()"><i class="fa fa-file-text-o"></i> Hóa đơn</a>*@
+@*                </li>*@
+@*            </ul>*@
+@*        </div>*@
+@*        <!-- /.navbar-collapse -->*@
+@*    </div>*@
+@*</nav>*@
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+        @*        <div class="panel-heading panel-heading-gray"><i style="color: #000" class="fa fa-list-ul"></i> Lịch sử hóa đơn*@
+        @*        </div>*@
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Lịch sử hóa đơn</span>
+            <ul class="nav nav-tabs pull-right" role="tablist">
+                <li class="active">
+                    <a href="/Home/ManageReceipt/View/HouseExpenseStatus"><i class="fa fa-file-text-o"></i> Khoản thu</a>
+                </li>
+                <li class="">
+                    <a href="/Home/ManageReceipt/View" style="color:#25ad9f"><i style="color:#25ad9f" class="fa fa-file-text-o"></i> Hóa đơn</a>
+                </li>
+            </ul>
+        </div>
+        <div class="panel-body">
+            <div class="form-horizontal" role="form">
+
+@*                <div class="form-group">*@
+@*                    <label class="control-label col-md-offset-3 col-md-1">Tháng</label>*@
+@*                    <div class="col-md-3">*@
+@*                        <input id="receiptsMonth" type="text" class="form-control" data-date-default-date="+0d" value="@thisMonth"*@
+@*                               data-date-start-view="1" data-date-format="mm-yyyy" data-date-language="vi"*@
+@*                               data-date-min-view-mode="1" data-date-end-date="0m" />*@
+@*                    </div>*@
+@*                    <div class="col-md-2">*@
+@*                        <span class="btn btn-primary" onclick="viewBalanceSheetMonth()">Xem</span>*@
+@*                    </div>*@
+@*                </div>*@
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <fieldset class="scheduler-border less-padding border-top">
+                            <legend class="scheduler-border bold-black">Hóa đơn trong tháng</legend>
+                            <div class="table-responsive">
+                                <table class="table v-middle table-bordered table-striped balance-sheet">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Tên</th>
+                                            <th>Tháng </th>
+                                            <th>Tổng </th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-hover">
+                                        @{
+                                            foreach (var r in receipts)
+                                            {
+                                                <tr>
+                                                    <td></td>
+                                                    <td>@r.Title</td>
+                                                    <td>@r.BalanceSheet.StartDate.Value.ToString(AmsConstants.MonthYearFormat)</td>
+                                                    @{
+                                                double totalOrder = 0;
+                                                foreach (var detail in r.ReceiptDetails)
+                                                {
+                                                    totalOrder += detail.UnitPrice.Value * detail.Quantity.Value;
+                                                }
+                                                    }
+                                                    <td>@totalOrder.ToString("N0")</td>
+                                                    <td></td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </fieldset>
+                    </div>
+                    @*<div class="col-md-6">
+                            <div id="leftCol" class="form-group" style="text-align: center;">
+                                <canvas style="width: 100% !important; max-width: 400px; height: auto !important;" id="expenseStatus" width="100%" height="100%"></canvas>
+                            </div>
+                        </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#receiptsMonth").datepicker(
+            {});
+        //        var rightHeight = $("#rightCol").outerHeight(true);
+        //        $("#leftCol").css("height", rightHeight);
+        //        $("#leftCol > canvas").addClass("align-middle");
+        var temp = [
+            {
+                Name: moment("2015-01-01", "YYYY-MM-DD"),
+                TotalAmount: 1500000
+            },
+        {
+            Name: moment("2015-02-01", "YYYY-MM-DD"),
+            TotalAmount: 3000000
+        },
+        {
+            Name: moment("2015-03-01", "YYYY-MM-DD"),
+            TotalAmount: 4000000
+        },
+        {
+            Name: moment("2015-04-01", "YYYY-MM-DD"),
+            TotalAmount: 1500000
+        },
+        {
+            Name: moment("2015-05-01", "YYYY-MM-DD"),
+            TotalAmount: 4000000
+        },
+        {
+            Name: moment("2015-06-01", "YYYY-MM-DD"),
+            TotalAmount: 3000000
+        },
+        {
+            Name: moment("2015-07-01", "YYYY-MM-DD"),
+            TotalAmount: 3500000
+        },
+        {
+            Name: moment("2015-08-01", "YYYY-MM-DD"),
+            TotalAmount: 2000000
+        },
+        {
+            Name: moment("2015-09-01", "YYYY-MM-DD"),
+            TotalAmount: 2305000
+        },
+        {
+            Name: moment("2015-10-01", "YYYY-MM-DD"),
+            TotalAmount: 2900000
+        },
+        {
+            Name: moment("2015-11-01", "YYYY-MM-DD"),
+            TotalAmount: 3300000
+        },
+        {
+            Name: moment("2015-12-01", "YYYY-MM-DD"),
+            TotalAmount: 5000000
+        }
+
+        ];
+        var expenseChart = createChartbar("expenseStatus", temp);
+    });
+
+    function createChartbar(id, data) {
+        var obj = {};
+        var listLbl = [];
+        var listVal = [];
+        var bgColorList = [];
+
+        for (var i = 0; i < data.length; i++) {
+            obj = data[i];
+            listLbl.push(obj.Name);
+            listVal.push(obj.TotalAmount);
+            bgColorList.push(randomColor2());
+        }
+        var config = {
+            type: 'line',
+            data: {
+                labels: listLbl,
+                datasets: [
+                    {
+                        label: "My First dataset",
+                        fill: false,
+                        lineTension: 0.1,
+                        borderColor: "rgba(75,192,192,1)",
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: "rgba(75,192,192,1)",
+                        pointBackgroundColor: "#fff",
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                        pointHoverBorderColor: "rgba(220,220,220,1)",
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 1,
+                        pointHitRadius: 10,
+
+                        data: listVal,
+                        backgroundColor: bgColorList
+                    }
+                ]
+            },
+            options: {
+                tooltips: {
+                    enabled: false
+                },
+                legend: {
+                    display: true,
+                    labels: {
+                        fontSize: 15
+                    },
+                    position: "bottom"
+                },
+                scales: {
+                    yAxes: [
+                    {
+                        ticks: {
+                            max: 5000000,
+                            min: 1000000,
+                            stepSize: 500000,
+                            callback: function (value, index, values) {
+                                return numberWithCommas(value);
+                            }
+                        }
+                    },
+                    ],
+                    xAxes: [
+                    {
+                        type: 'time',
+                        time: {
+                            // string/callback - By default, date objects are expected. You may use a pattern string from http://momentjs.com/docs/#/parsing/string-format/ to parse a time string format, or use a callback function that is passed the label, and must return a moment() instance.
+                            parser: false,
+                            // string - By default, unit will automatically be detected.  Override with 'week', 'month', 'year', etc. (see supported time measurements)
+                            unit: 'month',
+
+                            // Number - The number of steps of the above unit between ticks
+                            unitStepSize: 1,
+
+                            // string - By default, no rounding is applied.  To round, set to a supported time unit eg. 'week', 'month', 'year', etc.
+                            round: false,
+
+                            // Moment js for each of the units. Replaces `displayFormat`
+                            // To override, use a pattern string from http://momentjs.com/docs/#/displaying/format/
+                            displayFormats: {
+                                max: moment().endOf("year"),
+                                min: moment().startOf("year"),
+                                'millisecond': 'SSS [ms]',
+                                'second': 'h:mm:ss a', // 11:20:01 AM
+                                'minute': 'h:mm:ss a', // 11:20:01 AM
+                                'hour': 'MMM D, hA', // Sept 4, 5PM
+                                'day': 'MMM Do', // Sep 4 2015
+                                'week': 'll', // Week 46, or maybe "[W]WW - YYYY" ?
+                                'month': 'MM-YYYY', // Sept 2015
+                                'quarter': '[Q]Q - YYYY', // Q3
+                                'year': 'YYYY', // 2015
+                            },
+                        }
+                    }
+                    ]
+                }
+            }
+        };
+        var ctx2 = document.getElementById(id).getContext("2d");
+        return new Chart(ctx2, config);
+    }
+</script>

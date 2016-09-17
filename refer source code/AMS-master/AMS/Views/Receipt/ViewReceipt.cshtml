@@ -1,0 +1,438 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "ReceiptView";
+    Layout = "~/Views/Home/_socialNetworkLayout.cshtml";
+}
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Lịch sử hóa đơn</span>
+            <ul class="nav nav-tabs pull-right" role="tablist">
+                <li class="active">
+                    <a href="/Home/ManageReceipt/View"><i class="fa fa-file-text-o"></i> Hóa đơn</a>
+                </li>
+            </ul>
+        </div>
+        <div class="panel-body">
+            <form id="filterReceiptForm" class="form-horizontal" role="form">
+                <div class="form-group">
+                    <div class="form-group">
+                        <div class="col-md-10 col-md-offset-1">
+                            <div class="alert alert-danger" id="noReceipt" style="display: none">
+                                <a href="#" class="close" data-dismiss="alert" onclick="$('.alert').hide()" aria-label="close">&times;</a>
+                                <span id="msg">Không có hóa đơn trong thời gian từ [<strong id="fromMsg"></strong>] đến [<strong id="toMsg"></strong>]</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-10 col-md-offset-1">
+                            <div class="form-group">
+                                <label for="from" class="col-md-3 control-label">Lọc</label>
+                                <div class="col-md-6">
+                                    <select id="filterMode" name="Mode" class="form-control">
+                                        <option selected="selected" value="@SLIM_CONFIG.RECEIPT_FILTER_MODE_UNPAID">Chưa thanh toán</option>
+                                        <option value="@SLIM_CONFIG.RECEIPT_FILTER_MODE_THIS_MONTH">Tháng này</option>
+                                        <option value="@SLIM_CONFIG.RECEIPT_FILTER_MODE_LAST_MONTH">Tháng trước</option>
+                                        <option value="@SLIM_CONFIG.RECEIPT_FILTER_MODE_LAST_3_MONTH">3 Tháng gần đây</option>
+                                        <option value="@SLIM_CONFIG.RECEIPT_FILTER_MODE_RANGE_TIME">Khoản thời gian</option>
+                                        <option value="@SLIM_CONFIG.RECEIPT_FILTER_MODE_ALL">Tất cả</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-block btn-stroke btn-primary"><i class="fa fa-search"></i> Xem</button>
+                                </div>
+                            </div>
+                            <div class="form-group hide" id="filterRow">
+                                <label for="from" class="col-md-3 control-label">Từ</label>
+                                <div class=" col-md-8">
+                                    <div class="input-group input-daterange">
+                                        <input id="from" type="text" class="form-control" name="Start" />
+                                        <span class="input-group-addon">Đến</span>
+                                        <input id="to" class="form-control" name="End" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group payment-info">
+                        <div class="col-md-10 col-md-offset-1">
+                            <fieldset class="scheduler-border less-padding">
+                                <legend class="scheduler-border bold-black">Thông tin hóa đơn</legend>
+                                <div class="form-group">
+                                    <label for="title" class="col-md-3 control-label">Tổng</label>
+                                    <div class="col-md-8">
+                                        <div class="input-group">
+                                            <input id="totalAmount" readonly="readonly" class="form-control" value="" />
+                                            <span class="input-group-addon">đồng</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">Đã thanh toán</label>
+                                    <div class="col-md-8">
+                                        <div class="input-group">
+                                            <input readonly="readonly" id="paidAmount" class="form-control" value="" />
+                                            <span class="input-group-addon">đồng</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">Còn nợ</label>
+                                    <div class="col-md-8">
+                                        <div class="input-group">
+                                            <input id="restAmount" readonly="readonly" class="form-control" value="" />
+                                            <span class="input-group-addon">đồng</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+                <table id="houseOrderTbl" data-userid="@User.Identity.GetUserId()" class="table table-hover table-bordered hide">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tiêu đề</th>
+                            <th>Tổng</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày công bố</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>#</th>
+                            <th>Tiêu đề</th>
+                            <th>Tổng</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày công bố</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                    <tbody></tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function () {
+
+        $('.input-daterange').datepicker({
+            minViewMode: 1,
+            format: "mm-yyyy",
+            language: "vi"
+        });
+        $("#filterMode").on("change", function () {
+            var selected = $(this).find("option:selected").val();
+            var rangeTime = "@SLIM_CONFIG.RECEIPT_FILTER_MODE_RANGE_TIME";
+            if (parseInt(selected) === parseInt(rangeTime)) {
+                $("#filterRow").removeClass("hide");
+            } else {
+                $("#filterRow").addClass("hide");
+            }
+        });
+        GetAllUnpaidReceiptByHouse();
+        $("#filterReceiptForm").validate({
+            rules: {
+                Start: {
+                    required: {
+                        depends: function () {
+                            return $("#filterMode option:selected").val() === "@SLIM_CONFIG.RECEIPT_FILTER_MODE_RANGE_TIME";
+                        }
+                    },
+                },
+                End: {
+                    required: {
+                        depends: function () {
+                            return $("#filterMode option:selected").val() === "@SLIM_CONFIG.RECEIPT_FILTER_MODE_RANGE_TIME";
+                        }
+                    }
+                }
+            },
+            messages: {
+                Start: {
+                    required: "Nhập tháng bắt đầu.",
+                },
+                End: {
+                    required: "Nhập tháng kết thúc.",
+                }
+            },
+            submitHandler: function () {
+                GetReceiptListFromDateToDate();
+            }
+        });
+    });
+    function GetReceiptListFromDateToDate() {
+        var fromUserId = document.getElementById("houseOrderTbl").dataset.userid;
+        var from = $("#from").val();
+        var to = $("#to").val();
+
+        var data = {
+            from: from,
+            to: to,
+            userId: fromUserId,
+            mode: $("#filterMode").val()
+        }
+        if (window.dataTable5) {
+            window.dataTable5.destroy();
+        }
+        $("#houseOrderTbl").removeClass("hide");
+
+        window.dataTable5 = $("#houseOrderTbl").DataTable({
+            "ajax": {
+                url: "/Home/ManageReceipt/GetOrderList?" + $.param(data),
+                dataSrc: function (data) {
+                    if (data.StatusCode === 0) {
+                        var obj = data.Data;
+                        $("#totalAmount").val(numberWithCommas(obj.Total));
+                        $("#restAmount").val(numberWithCommas(obj.RestAmount));
+                        $("#paidAmount").val(numberWithCommas(obj.PaidAmount));
+                        $(".payment-info").removeClass("hide");
+
+                        if (obj.Data && obj.Data.length === 0) {
+                            $(".payment-info").addClass("hide");
+                            $("#totalAmount").val("");
+                            $("#restAmount").val("");
+                            $("#paidAmount").val("");
+                            $("#msg").html("Không tìm thấy hóa đơn nào !");
+                            $("#noReceipt").fadeIn("fast");
+                            setTimeout(function () {
+                                $("#noReceipt").fadeOut("fast");
+                            }, 3000);
+                        }
+
+                        return obj.Data;
+                    } else {
+                        $(".payment-info").addClass("hide");
+                        $("#totalAmount").val("");
+                        $("#restAmount").val("");
+                        $("#paidAmount").val("");
+
+                        var selected = $("#filterMode").val();
+                        var rangeTime = "@SLIM_CONFIG.RECEIPT_FILTER_MODE_RANGE_TIME";
+                        if (parseInt(selected) === parseInt(rangeTime)) {
+                            $("#msg")
+                                .html("Không có hóa đơn trong thời gian từ đầu tháng [<strong>" +
+                                    $("#from").val() +
+                                    "</strong>] đến hết tháng [<strong>" +
+                                    $("#to").val() +
+                                    "</strong>]");
+                        } else {
+                            $("#msg").html("Không tìm thấy hóa đơn nào !");
+                        }
+                        $("#noReceipt").fadeIn("fast");
+                        setTimeout(function () {
+                            $("#noReceipt").fadeOut("fast");
+                        }, 3000);
+                        return [];
+                    }
+                }
+            },
+            "bLengthChange": false,
+            "bInfo": false,
+            "order": [[4, "desc"]],
+            "columns": [
+                { data: "ReceiptTitle" },
+                { data: "ReceiptTitle" },
+                { data: "TotalOrder" },
+                { data: "Status" },
+                { data: "PublishDate" },
+                { data: "ReceiptId" }
+            ],
+            "columnDefs": [
+                {
+                    "searchable": false,
+                    "orderable": false,
+                    "targets": 0
+                },
+                {
+                    "targets": 2,
+                    "render": function (data, type, full, meta) {
+                        if (type === "display" || type === "filter") {
+                            return numberWithCommas(data);
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "targets": 3,
+                    "data": "Status",
+                    "render": function (data, type, full) {
+                        if (type === "display" || type === "filter") {
+                            if (data === window.StatusUnpaid) {
+                                return "<span class='label label-danger'> Chưa thanh toán</div>";
+                            } else if (data === window.StatusPaid) {
+                                return "<span class='label label-success'>" + "Đã thanh toán" + "</div>";
+                            }
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "targets": 4,
+                    "data": "CreateDate",
+                    "render": function (data, type, full) {
+                        if (type === "display" || type === "filter") {
+                            if (data !== null && data !== undefined) {
+//                                var dateTime = data.split(" ");
+                                return "<strong>" + data +
+                                    "</strong> ";
+//                                    "</strong> " + dateTime[1];
+                                /*return "<span class='label date-color label-warning'>" + dateTime[0] +
+                                    "</span>  <span class='label time-color label-gray'>" + dateTime[1] + "</span>";*/
+                            }
+                        }
+                        return full.PublishDateStick;
+                    }
+                }, {
+
+                    "targets": 5,
+                    "data": "ReceiptId",
+                    "render": function (data, type, full) {
+                        if (type === "display" || type === "filter") {
+                            if (data !== null && data !== undefined) {
+                                return"<div class='pull-right'>" +
+                                "<span onclick='showOrderDetail(" + data + "," + fromUserId + ")' class='btn btn-info btn-xs lbl-margin-right'>" +
+                                    "<i class='fa fa-info'></i>" +
+                                    "</div> "+
+                                    "</span> ";
+                            }
+                        }
+                        return data;
+                    },
+                    "searchable": false,
+                    "orderable": false,
+                }
+            ]
+        });
+        generateTableIndex(dataTable5);
+    }
+
+    function GetAllUnpaidReceiptByHouse() {
+
+        var fromUserId = document.getElementById("houseOrderTbl").dataset.userid;
+        if (window.dataTable5) {
+            window.dataTable5.destroy();
+        }
+        $("#houseOrderTbl").removeClass("hide");
+
+        window.dataTable5 = $("#houseOrderTbl").DataTable({
+            "ajax": {
+                url: "/Home/ManageReceipt/GetUnpaidReceipt?userId=" + fromUserId,
+                dataSrc: function (data) {
+                    if (data.StatusCode === 0) {
+                        var obj = data.Data;
+                        $("#totalAmount").val(numberWithCommas(obj.Total));
+                        $("#restAmount").val(numberWithCommas(obj.RestAmount));
+                        $("#paidAmount").val(numberWithCommas(obj.PaidAmount));
+                        $(".payment-info").removeClass("hide");
+
+                        if (obj.Data && obj.Data.length === 0) {
+                            $(".payment-info").addClass("hide");
+                            $("#totalAmount").val("");
+                            $("#restAmount").val("");
+                            $("#paidAmount").val("");
+                            $("#msg").html("Không tìm thấy hóa đơn nào !");
+                            $("#noReceipt").fadeIn("fast");
+                            setTimeout(function () {
+                                $("#noReceipt").fadeOut("fast");
+                            }, 3000);
+                        }
+
+                        return obj.Data;
+                    } else {
+                        $(".payment-info").addClass("hide");
+                        $("#totalAmount").val("");
+                        $("#restAmount").val("");
+                        $("#paidAmount").val("");
+                        $("#msg").html("Không tìm thấy hóa đơn nào !");
+                        $("#noReceipt").fadeIn("fast");
+                        setTimeout(function () {
+                            $("#noReceipt").fadeOut("fast");
+
+                        }, 3000);
+                        return [];
+                    }
+                }
+            },
+            "bLengthChange": false,
+            "bInfo": false,
+            "order": [[4, "desc"]],
+            "columns": [
+                { data: "ReceiptTitle" },
+                { data: "ReceiptTitle" },
+                { data: "TotalOrder" },
+                { data: "Status" },
+                { data: "PublishDate" },
+                { data: "ReceiptId" }
+            ],
+            "columnDefs": [
+                {
+                    "searchable": false,
+                    "orderable": false,
+                    "targets": 0
+                },
+                {
+                    "targets": 2,
+                    "render": function (data, type, full, meta) {
+                        if (type === "display" || type === "filter") {
+                            return numberWithCommas(data);
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "targets": 3,
+                    "data": "Status",
+                    "render": function (data, type, full) {
+                        if (type === "display" || type === "filter") {
+                            if (data === window.StatusUnpaid) {
+                                return "<span class='label label-danger'> Chưa thanh toán</div>";
+                            } else if (data === window.StatusPaid) {
+                                return "<span class='label label-success'>" + "Đã thanh toán" + "</div>";
+                            }
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "targets": 4,
+                    "data": "CreateDate",
+                    "render": function (data, type, full) {
+                        if (type === "display" || type === "filter") {
+                            if (data !== null && data !== undefined) {
+//                                var dateTime = data.split(" ");
+                                return "<strong>" + data +
+                                    "</strong> ";
+//                                    "</strong> " + dateTime[1];
+                                /*return "<span class='label date-color label-warning'>" + dateTime[0] +
+                                    "</span>  <span class='label time-color label-gray'>" + dateTime[1] + "</span>";*/
+                            }
+                        }
+                        return full.PublishDateStick;
+                    }
+                }, {
+                    "targets": 5,
+                    "data": "ReceiptId",
+                    "render": function (data, type, full) {
+                        if (type === "display" || type === "filter") {
+                            if (data !== null && data !== undefined) {
+                                return "<div style='text-align:right'>" +
+                                        "<span onclick='showOrderDetail(" + data + "," + fromUserId + ")' class='btn btn-info btn-xs lbl-margin-right'>" +
+                                            "<i class='fa fa-info'></i>" +
+                                            "</span> " +
+                                        "</div> ";
+                            }
+                        }
+                        return data;
+                    }
+                }
+            ]
+        });
+        generateTableIndex(dataTable5);
+    }
+</script>

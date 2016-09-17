@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "Graph";
+    Layout = "~/Views/Management/__ManagementLayout.cshtml";
+}
+
+<h2>Graph</h2>
+<script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+<input type="text" id="id1" onblur="bInfo()" />
+<input type="text" id="id2" onblur="bInfo()" />
+
+
+
+<script>
+    function bInfo() {
+        in1 = document.getElementById('id1').value;
+        in2 = document.getElementById('id2').value;
+        if (in1 == in2 && in1 !="" && in2 != "") {
+            alert('Same Value'); return false;
+        } else { return true; }
+    }
+   
+
+</script>

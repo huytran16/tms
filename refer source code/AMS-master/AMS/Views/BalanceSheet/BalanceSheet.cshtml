@@ -1,0 +1,336 @@
+﻿@using AMS.Constant
+@using AMS.Models
+@using Microsoft.AspNet.Identity
+<script src="~/Scripts/Chart.min.js"></script>
+@{
+    if (User.IsInRole("Manager"))
+    {
+        ViewBag.Title = "ManageReipt";
+        Layout = "~/Views/Management/__ManagementLayout.cshtml";
+    }
+    else
+    {
+        ViewBag.Title = "ManageReipt";
+        Layout = "~/Views/Home/_socialNetworkLayout.cshtml";
+    }
+
+    bool balanceSheetIsCreated = ViewBag.balanceSheetIsCreated == null ? true : ViewBag.balanceSheetIsCreated;
+
+    string incomeTransactionsJson = "";
+    string expenseTransactionsJson = "";
+    BalanceSheetProcessingModel bls = new BalanceSheetProcessingModel();
+    BalanceSheet blsInfo = new BalanceSheet();
+
+    if (balanceSheetIsCreated)
+    {
+        incomeTransactionsJson = ViewBag.incomeTransactionsJson;
+        expenseTransactionsJson = ViewBag.expenseTransactionsJson;
+
+        bls = ViewBag.balanceSheet;
+        blsInfo = ViewBag.balanceSheetInfo;
+    }
+}
+
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Báo cáo thu chi</span>
+            <ul class="nav nav-tabs pull-right" role="tablist">
+                @if (User.IsInRole("Manager"))
+                {
+                    <li class="active">
+                        <a href="/Management/BalanceSheet/View/@User.Identity.GetUserId()"><i class="fa fa-tachometer"></i> Báo cáo thu chi</a>
+                    </li>
+                    <li>
+                        <a href="/Management/BalanceSheet/ManageBalanceSheetView"><i class="fa fa-calculator"></i> Quản lý thu chi</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="active">
+                        <a href="/Management/BalanceSheet/View/@User.Identity.GetUserId()"><i class="fa fa-tachometer"></i> Báo cáo thu chi</a>
+                    </li>
+                }
+
+
+            </ul>
+        </div>
+
+        <div class="panel-body">
+            <div class="tab-content">
+                <div class="tab-pane fade active in" id="">
+                    <div class="form-horizontal" id="searchHdSrv" role="form">
+                        @{
+                            if (!balanceSheetIsCreated)
+                            {
+                                <div class="alert alert-danger" id="successAddTransNotify">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                    <span>Bảng thu chi hàng tháng vẫn chưa được tạo.</span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-offset-3 col-md-1">Tháng</label>
+                                    <div class="col-md-3">
+                                        <input id="bsheetMonth" type="text" class="form-control" data-date-default-date="+0d"
+                                               data-date-start-view="1" data-date-format="mm-yyyy" data-date-language="vi"
+                                               data-date-min-view-mode="1" data-date-end-date="0m" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span class="btn btn-block btn-primary" onclick="viewBalanceSheetMonth()">Xem</span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="form-group">
+                                    <label class="control-label col-md-offset-3 col-md-1">Tháng</label>
+                                    <div class="col-md-3">
+                                        <input id="bsheetMonth" type="text" class="form-control" data-date-default-date="+0d" value="@blsInfo.StartDate.Value.ToString(AmsConstants.MonthYearFormat)"
+                                               data-date-start-view="1" data-date-format="mm-yyyy" data-date-language="vi"
+                                               data-date-min-view-mode="1" data-date-end-date="+1m" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span class="btn btn-primary" onclick="viewBalanceSheetMonth()">Xem</span>
+                                    </div>
+                                </div>
+
+                                <div class=" form-group">
+                                    <div class=" form-group">
+                                        <div class="col-md-offset-1 col-md-10">
+                                            <fieldset class="scheduler-border less-padding">
+                                                <legend class="scheduler-border bold-black">Thông tin</legend>
+                                                <div class="form-group">
+                                                    <label for="title" class="col-md-3 control-label">Tiêu đề</label>
+                                                    <div class="col-md-9">
+                                                        <input id="title" class="form-control" value="Bảng thu chi tài chính tháng @blsInfo.StartDate.Value.ToString(AmsConstants.MonthYearFormat)" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">Từ ngày</label>
+                                                    <div class="col-md-9">
+                                                        <div class="input-group">
+                                                            @{if (@blsInfo.StartDate.Value.Date == DateTime.Today)
+                                                            {
+                                                                <input class="form-control" value="@blsInfo.StartDate.Value.ToString(AmsConstants.DateFormat)" />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input class="form-control" value="@blsInfo.StartDate.Value.ToString(AmsConstants.DateFormat)" />
+                                                                <span class="input-group-addon">đến</span>
+                                                                <input class="form-control" value="@(blsInfo.ClosingDate == null ? "Hôm nay" : blsInfo.ClosingDate.Value.ToString(AmsConstants.DateFormat))" />
+                                                            }
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="title" class="col-md-3 control-label">Trạng thái</label>
+                                                    <div class="col-md-3">
+                                                        @{if (blsInfo.Status.Value == SLIM_CONFIG.BALANCE_SHEET_CLOSE)
+                                                        {
+                                                            <span class="btn btn-danger btn-block">Đóng</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="btn btn-info  btn-block">Mở</span>
+                                                        }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table class="table v-middle table-bordered table-striped balance-sheet">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 30%" rowspan="2">Tên</th>
+                                                        <th colspan="4" class="text-capitalize text-center" style="background-color: #dddddd">
+                                                            Bảng thu chi tháng @blsInfo.StartDate.Value.ToString(AmsConstants.MonthYearFormat)
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        @*<th style="width: 30%;">Tồn</th>*@
+                                                        <th style="width: 25%;">Tồn</th>
+                                                        <th style="width: 25%;">Tổng</th>
+                                                        <th style="width: 25%;">Thực thu</th>
+                                                        <th style="width: 25%;">Thực chi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><strong>Đầu kỳ</strong></td>
+                                                        <td id="redudancyStartMonth" colspan="4">@bls.RedudancyStartMonth.ToString("N0")</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Doanh thu</strong></td>
+                                                        <td></td>
+                                                        <td id="forecastIncome">@bls.ForecastIncome.ToString("N0")</td>
+                                                        <td id="actualIncome">@bls.ActualIncome.ToString("N0")</td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Chi phí</strong></td>
+                                                        <td></td>
+                                                        <td id="forecastExpense">@bls.ForecastExpense.ToString("N0")</td>
+                                                        <td></td>
+                                                        <td id="actualExpense">@bls.ActualExpense.ToString("N0")</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>Cuối kỳ</strong></td>
+                                                        <td id="redudancyEndMonth" colspan="4">@bls.RedudancyEndMonth.ToString("N0")</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <fieldset class="scheduler-border less-padding border-top">
+                                            <legend class="scheduler-border bold-black text-capitalize">Các khoản thu trong tháng</legend>
+                                            <div class="table-responsive">
+                                                <table id="detailIncomeTbl" class="table v-middle table-striped table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Khoản thu</th>
+                                                            <th>Thực thu</th>
+                                                            <th>Tổng</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @{foreach (var inc in bls.IncomeList)
+                                                        {
+                                                            <tr>
+                                                                <td></td>
+                                                                <td>@inc.UtilSrvCatName</td>
+                                                                <td>@inc.TransPaidAmount.ToString("N0")</td>
+                                                                <td>@inc.TransTotalAmount.ToString("N0")</td>
+                                                            </tr>
+                                                        }
+                                                        }
+                                                    </tbody>
+                                                    <tfoot>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-md-6 canvas-bls">
+                                        <canvas id="incomeChart" width="100%" height="100%"></canvas>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+
+                                    <div class="col-md-6">
+                                        <fieldset class="scheduler-border less-padding border-top">
+                                            <legend class="scheduler-border bold-black text-capitalize"> Các khoản chi trong tháng</legend>
+                                            <div class="table-responsive">
+                                                <table id="detailExpensetbl" class="table v-middle table-striped  table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Khoản chi</th>
+                                                            <th>Thực chi</th>
+                                                            <th>Tổng</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @{foreach (var inc in bls.ExpenseList)
+                                                        {
+                                                            <tr>
+                                                                <td></td>
+                                                                <td>@inc.UtilSrvCatName</td>
+                                                                <td>@inc.TransPaidAmount.ToString("N0")</td>
+                                                                <td>@inc.TransTotalAmount.ToString("N0")</td>
+                                                            </tr>
+                                                        }
+                                                        }
+                                                    </tbody>
+                                                    <tfoot>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-md-6 canvas-bls">
+                                        <canvas id="expenseChart" width="100%" height="100%"></canvas>
+                                    </div>
+                                </div>
+                            }
+                            <input type="hidden" id="incomeData" value="@incomeTransactionsJson" />
+                            <input type="hidden" id="expenseData" value="@expenseTransactionsJson" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#bsheetMonth").datepicker(
+        {});
+
+        var detailIncomeTbl = $("#detailIncomeTbl").DataTable({
+            "bLengthChange": false,
+            "bInfo": false,
+            "bPaginate": false,
+            "searching": false,
+            "language": {
+                "emptyTable": "Không có dữ liệu"
+            },
+            headers: {
+                1: {
+                    sorter: false
+                }
+            }
+        });
+        generateTableIndex(detailIncomeTbl);
+
+        var detailExpensetbl = $("#detailExpensetbl").DataTable({
+            "bLengthChange": false,
+            "bInfo": false,
+            "bPaginate": false,
+            "searching": false,
+            "language": {
+                "emptyTable": "Không có dữ liệu"
+            },
+            headers: {
+                1: {
+                    sorter: false
+                }
+            }
+        });
+        generateTableIndex(detailExpensetbl);
+        var incomeData = JSON.parse($("#incomeData").val());
+        var expenseData = JSON.parse($("#expenseData").val());
+
+
+
+        if (incomeData !== undefined && incomeData !== null && incomeData.length !== 0) {
+            var incomeChart = createChart("incomeChart", incomeData);
+        }
+        if (incomeData !== undefined && incomeData !== null && incomeData.length !== 0) {
+            var expenseChart = createChart("expenseChart", expenseData);
+        }
+
+    });
+
+
+
+    function viewBalanceSheetMonth() {
+        var month = $("#bsheetMonth").val();
+        location.href = "/Management/BalanceSheet/View?month=" + encodeURIComponent(month);
+    }
+
+
+</script>

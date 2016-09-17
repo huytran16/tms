@@ -1,0 +1,696 @@
+﻿@using AMS.Service
+@model AMS.ViewModel.SurveyViewModel
+@{
+    ViewBag.Title = "DoDetailSurvey";
+
+    Layout = "~/Views/Home/_socialNetworkLayout.cshtml";
+    Poll surveys = ViewBag.Survey;
+    List<string> listAnswer = ViewBag.CountAnswer;
+    List<string> answers = ViewBag.Answer;
+    List<Poll> listSurveys = ViewBag.ListSurvey;
+    User currentUser = ViewBag.currentUser;
+    House currentHouse = ViewBag.currentHouse;
+    UserAnswerService userAnswerService = new UserAnswerService();
+    BlockPollService BlockPollService = new BlockPollService();
+    List<UserAnswerPoll> listUserAnswer = new List<UserAnswerPoll>();
+}
+<style>
+    .media-post-ctr .media-post-header .media-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .media-post-ctr .media-post-header .media-meta-ctr .author-profile-img {
+        float: left;
+        margin-right: 20px;
+    }
+
+        .media-post-ctr .media-post-header .media-meta-ctr .author-profile-img img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+
+    .media-post-ctr .media-post-header .media-meta-ctr .media-meta-overview-ctr .media-meta-author-info {
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 8px;
+    }
+
+    .media-post-ctr .media-post-header .media-meta-ctr .media-meta-overview-ctr .media-meta-post-info {
+        color: #bbb;
+        padding-top: 3px;
+    }
+
+    .poll-ctr .poll-question-ctr .poll-question-img {
+        position: relative;
+    }
+
+    .poll-ctr.style-1 .poll-question-ctr {
+        margin: 10px 0;
+    }
+
+    .poll-ctr .poll-question-ctr.poll-unanswered .poll-txt {
+        background-color: rgba(64,145,196,0.7);
+    }
+
+    .poll-ctr .poll-question-ctr .poll-question-img .poll-txt {
+        position: absolute;
+        bottom: 0;
+    }
+
+    .poll-ctr .poll-question-ctr .poll-txt {
+        padding: 10px;
+        width: 100%;
+        font-weight: bold;
+        color: #fff;
+        font-size: 24px;
+        text-align: center;
+        word-wrap: break-word;
+        position: relative;
+    }
+
+    .binh {
+        border-color: #1ABC9C;
+        box-shadow: none;
+    }
+    .widget {
+        margin-bottom: 20px;
+    }
+    .ribbon-header {
+        display: block;
+        color: #fff;
+        padding: 10px 10px;
+        text-align: center;
+        text-transform: uppercase;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+        position: relative;
+        margin: 0 -8px;
+        margin-top: -40px;
+    }
+
+    .ribbon-teal {
+        background-color: #0dd3bb;
+    }
+    .media-item-ctr-2 {
+        padding-bottom: 1em;
+        margin-top: 1em;
+        width: 100%;
+        position: relative;
+        float: left;
+    }
+        .media-item-ctr-2 .media-item-thumbnail {
+            display: block;
+            position: relative;
+        }
+    .media-ribbon {
+        position: absolute;
+        top: 15px;
+        left: -8px;
+        background-color: #ff4500;
+        padding: 0 3px;
+        font-family: 'Montserrat', sans-serif;
+        color: #fff;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        line-height: 24px;
+        font-size: 11px;
+    }
+    .media-item-ctr-2 .media-item-overview {
+        position: relative;
+        padding-bottom: 15px;
+    }
+        .media-item-ctr-2 .media-item-overview .media-meta-data {
+            margin-top: 10px;
+            color: #b5b3ac;
+            font-size: 11px;
+        }
+    .widget .media-item-ctr-2 {
+        padding-bottom: 0;
+    }
+
+    .media-item-ctr-2 {
+        padding-bottom: 1em;
+        margin-top: 1em;
+        width: 100%;
+        position: relative;
+        float: left;
+    }
+    .widget .media-item-ctr-2 img {
+        height: 120px;
+    }
+
+    .media-item-ctr-2 .media-item-thumbnail img {
+        width: 75%;
+        max-height: 160px;
+    }
+</style>
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/highcharts.js"></script>
+<script src="~/Scripts/amsScript/canvasjs.min.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet"/>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<div class="col-xs-12 col-sm-8">
+    <div class="panel panel-default">
+
+        @*<nav class="navbar navbar-default">
+                <nav class="navbar navbar-default binh">
+                    <div class="container-fluid binh">
+
+                        <ul class="nav navbar-nav binh">
+                            <li class="active binh"><a href="/Survey/Survey"><i class="glyphicon glyphicon-home"></i><b>Trang chính</b></a></li>
+
+
+                        </ul>
+                    </div>
+                </nav>
+            </nav>*@
+
+        <div class="panel-body">
+            <fieldset class="scheduler-border less-padding">
+                @*<form class="form-horizontal" role="form" method="post">*@
+                <div class="table-responsive">
+                    @using (Html.BeginForm("DoDetailSurvey", "Survey", FormMethod.Post))
+                    {
+
+
+                    <div class="media-post-ctr">
+                        <div class="media-post-header">
+
+                            @*<h1 class="media-title">@surveys.Question</h1>*@
+                            <div class="media-meta-ctr">
+                                <div class="author-profile-img">
+                                    <img class="img-responsive" src="@surveys.ImageUrl">
+                                </div>
+                                <div class="media-meta-overview-ctr">
+                                    @*<div class="media-meta-author-info">
+                                        By <a href="~/images/Post/default-profile.png">Admin</a>
+                                    </div>*@
+                                    <div class="media-meta-post-info" style="font-size: 14px; color: green;">
+                                        @Convert.ToString(string.Format("{0:MM/dd/yyyy}", surveys.EndDate))
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="poll-ctr style-1" data-question-count="1">
+                            <div class="poll-question-ctr  poll-unanswered " data-total-votes="8">
+                                <div class="poll-question-img">
+                                    <img src="~/images/Post/SEO_survey_reuslts-1024x768.jpg" class="img-responsive">
+                                    <div class="poll-txt">
+                                        @surveys.Question
+                                    </div>
+                                </div>
+                                <br />
+
+
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+                    </div>
+                    
+                        int i = 0;
+                        int count = answers.Count;
+                        if (i < count)
+                        {
+                    <div class="form-group">
+                        <div class="col-sm-offset-1 col-sm-10">
+                            <fieldset class="scheduler-border less-padding">
+                                <legend class="scheduler-border">Lựa Chọn</legend>
+                                @*<div class="col-md-10">
+                                    <label  class="col-md-4">Câu Hỏi :</label>
+                                    <div class="col-md-8">
+                                        <textarea style="margin-bottom: 20px" disabled="disabled" cols="30" class="form-control binh col-sm-6">@surveys.Question</textarea><br/>
+                                      
+                                    </div><br />
+                                </div><br />*@
+                                <div class="col-sm-12">
+
+                                    @{
+
+
+                            int counts = 1;
+
+                            foreach (var b in answers)
+                            {
+                                if (b != null && !b.Equals(""))
+                                {
+                                    <div class="col-sm-1"> </div>
+                                        <div class="col-sm-1">
+                                          
+                                            @Html.TextBoxFor(m => m.Id, new { @type = "hidden", @Value = surveys.Id })
+
+                                            <input type="radio" id="@b" name="answer" value="@b">
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <input type="hidden" id="answerId" name="answerId" value="@b" />
+                                            <input type="hidden" id="count" name="count" value="@counts" />
+                                            <input type="text" disabled="disabled" class="form-control binh" @*style="width: 230px"*@ id="@counts" name="anwser1" value="@b"><br/>
+
+
+                                        </div>
+                                counts++; 
+                                }
+                              
+                            }
+                          
+                                    }
+                                </div>
+
+
+
+                            </fieldset>
+                        </div>
+                    </div>
+                        }
+
+
+                    <div class="form-group" >
+                        <div class="col-sm-offset-3 col-sm-8" style="margin-top: 20px">
+                            @*<a href="@Url.Action("UpdateSurvey", "Survey", new { PollId =@surveys.Id})" class="fa fa-list-alt">Lưu..</a>*@
+                            <button type="submit" onclick="addCommentByAjax()" class="btn btn-primary">Xác Nhận</button>
+
+                            @*@{
+            if (surveys.Privacy == 1)
+            {*@
+                            @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModall">Xem kết quả</button>*@
+                            @*}
+            }*@
+
+                        </div>
+
+                    </div>
+
+                    }
+
+
+                </div>
+
+
+            </fieldset>
+        </div>
+
+    </div>
+</div>
+<div class="col-md-4 hidden-xs">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="widget">
+                <div class="fb-page fb_iframe_widget" data-href="" data-tabs="timeline" data-width="100%" data-height="130" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true" fb-xfbml-state="rendered" fb-iframe-plugin-query="adapt_container_width=true&amp;app_id=1470730869903086&amp;container_width=328&amp;height=130&amp;hide_cover=false&amp;href=https%3A%2F%2Fwww.facebook.com%2Fjaskokoyn&amp;locale=en_US&amp;sdk=joey&amp;show_facepile=true&amp;small_header=false&amp;tabs=timeline&amp;width=100%25"><span style="vertical-align: top; width: 0px; height: 0px; overflow: hidden;"><iframe name="f176e5b0d7d0344" width="100%px" height="130px" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" title="fb:page Facebook Social Plugin" src="" style="border: none; visibility: visible; width: 0px; height: 0px;"></iframe></span></div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="clearfix"></div>
+          
+            <div class="widget">
+                <a class="ribbon-header ribbon-teal">
+                    <i class="fa fa-star fa-cat-icon"></i>
+                    Những Bình Chọn Khác
+                    <i class="fa fa-angle-right"></i>
+                </a><br/>
+                @{
+    foreach (var item in listSurveys)
+    {
+        List<BlockPoll> listBlockPolls = BlockPollService.FindByPollId(item.Id);
+        listUserAnswer = (userAnswerService.GetListUserAnswerPollsByPollId(item.Id));
+        int k = 0;
+        int p = 0;
+        if (listSurveys.Count != 0)
+        {
+            if (item.Mode == 1 )
+            {
+                foreach (var VARIABLE in listUserAnswer)
+                {
+
+                    if (VARIABLE.UserId == currentUser.Id)
+                    {
+                        k++;
+                    }
+
+                }
+                foreach (var obj in listBlockPolls)
+                {
+                    if (obj.BlockId == BlockPollService.FindBlockIdByHouseId(currentUser.HouseId.Value).BlockId)
+                    {
+                        p++;
+                    }
+                }
+                if (k != 1 || p == 1)
+                   // if (k != 1 )
+                {
+                    <fieldset class="scheduler-border less-padding">
+                        <div class="media-item-ctr-2">
+                            <a class="media-item-thumbnail" href="@Url.Action("DoDetailSurvey", "Survey", new { PollId = @item.Id })">
+                                <img src="@item.ImageUrl" class="img-responsive">
+                                <div class="media-ribbon"><i class="fa fa-heart"></i> @item.Id</div>
+                            </a>
+                            <div class="media-item-overview">
+                                <h3><a href="@Url.Action("DoDetailSurvey", "Survey", new { PollId = @item.Id })">@item.Question</a></h3>
+                                <div class="media-meta-data">@Convert.ToString(string.Format("{0:MM/dd/yyyy}", item.PublishDate))</div>
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+            } else  if (item.Mode == 2 && currentUser.RoleId ==4)
+            {
+                foreach (var VARIABLE in listUserAnswer)
+                {
+
+                    if (VARIABLE.UserId == currentUser.Id)
+                    {
+                        k++;
+                    }
+
+                }
+                foreach (var obj in listBlockPolls)
+                {
+                    if (obj.BlockId == BlockPollService.FindBlockIdByHouseId(currentUser.HouseId.Value).BlockId)
+                    {
+                        p++;
+                    }
+                }
+                if ((k != 1 && p == 1) || p == 0)
+                    //if (k != 1)
+                {
+                    <fieldset class="scheduler-border less-padding">
+                        <div class="media-item-ctr-2">
+                            <a class="media-item-thumbnail" href="@Url.Action("DoDetailSurvey", "Survey", new { PollId = @item.Id })">
+                                <img src="@item.ImageUrl" class="img-responsive">
+                                <div class="media-ribbon"><i class="fa fa-heart"></i> @item.Id</div>
+                            </a>
+                            <div class="media-item-overview">
+                                <h3><a href="@Url.Action("DoDetailSurvey", "Survey", new { PollId = @item.Id })">@item.Question</a></h3>
+                                <div class="media-meta-data">@Convert.ToString(string.Format("{0:MM/dd/yyyy}", item.PublishDate))</div>
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+            }
+            else if ((item.Mode == 3 && currentUser.RoleId == 4 && item.Status == 1) || (item.Mode == 3 && currentUser.RoleId == 3 && item.Status == 1))
+            {
+                foreach (var VARIABLE in listUserAnswer)
+                {
+
+                    if (VARIABLE.UserId == currentUser.Id)
+                    {
+                        k++;
+                    }
+
+                }
+                foreach (var obj in listBlockPolls)
+                {
+                    if (obj.BlockId == BlockPollService.FindBlockIdByHouseId(currentUser.HouseId.Value).BlockId)
+                    {
+                        p++;
+                    }
+                }
+                if ((k != 1 && p == 1) || p == 0)
+               // if (k != 1)
+                {
+                    <fieldset class="scheduler-border less-padding">
+                        <div class="media-item-ctr-2">
+                            <a class="media-item-thumbnail" href="@Url.Action("DoDetailSurvey", "Survey", new { PollId = @item.Id })">
+                                <img src="@item.ImageUrl" class="img-responsive">
+                                <div class="media-ribbon"><i class="fa fa-heart"></i> @item.Id</div>
+                            </a>
+                            <div class="media-item-overview">
+                                <h3><a href="@Url.Action("DoDetailSurvey", "Survey", new { PollId = @item.Id })">@item.Question</a></h3>
+                                <div class="media-meta-data">@Convert.ToString(string.Format("{0:MM/dd/yyyy}", item.PublishDate))</div>
+                            </div>
+                        </div>
+                    </fieldset>
+                }
+            }
+
+        }
+
+        else if (listSurveys.Count == 0)
+        {
+
+        }
+
+
+    }
+}
+               
+              
+            </div>
+            <div class="clearfix"></div>
+         
+            <div class="clearfix"></div>
+          
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<div id="myModall" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header login" style="text-align: center; font-size: 42px; background-color: green">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <div class="isa_success">
+                        <label class="label label-success">Kết quả khảo sát</label>
+                    </div>
+            </div>
+            <div class="modal-body">
+                <fieldset class="scheduler-border less-padding">
+                    @{
+                        int abc = 1;
+                        foreach (var item in listAnswer)
+                        {
+                            <input type="hidden" id="answer_@abc" name="countAnser" value="@item" />
+                            abc++;
+                        }
+
+                    }
+                    @*<div id="chartContainer" style="width: 100%; height: 300px"></div>*@
+                    <div id="container" style="min-width: 300px; height: auto; margin: 0 auto; text-align: center"></div>
+                </fieldset>
+            </div>
+            <div class="modal-footer" style="background-color: green"></div>
+        </div>
+    </div>
+</div>
+<script>
+    var answer2 = parseFloat($("#answer_2").val()) || null
+    var answer1 = parseFloat($("#answer_1").val()) || null
+    var answer3 = parseFloat($("#answer_3").val()) || null
+    var answer4 = parseFloat($("#answer_4").val()) || null
+    var answer5 = parseFloat($("#answer_5").val()) || null
+    var answer2a = ($("#2").val()) || null
+    var answer1a = ($("#1").val()) || null
+    var answer3a = ($("#3").val()) || null
+    var answer4a = ($("#4").val()) || null
+    var answer5a = ($("#5").val()) || null
+    var a = "Lựa chọn 1"
+    var b = "Lựa chọn 2"
+    var c = "Lựa chọn 3"
+    var d = "Lựa chọn 4"
+    var e = "Lựa chọn 5"
+    $(document).ready(function () {
+        //var a = document.getElementById('#answerr_1').value;
+        //var b = document.getElementById('#answerr_2').value;
+        //var c = document.getElementById('#answerr_3').value;
+
+        if (answer1 === 0 && answer2 === 0 && answer3 === 0) {
+            //RenderPieCharts('container', [
+            //[a, null],
+            //[b, null],
+            //[c, null]
+
+            //]);
+            return '<h4>' + "Chưa có dữ liệu" + '</h4>'
+        } else {
+            RenderPieChart('container', [
+            [answer1a, answer1],
+            [answer2a, answer2],
+            [answer3a, answer3],
+              [answer4a, answer4],
+                [answer5a, answer5]
+
+            ]);
+        }
+
+
+
+        function RenderPieChart(elementId, dataList) {
+            new Highcharts.Chart({
+                chart: {
+                    renderTo: elementId,
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                }, title: {
+                    //text: '<span class="label">Biểu đồ kết quả khảo sát</span>'
+                    text: null,
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            formatter: function () {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                            }
+                        },
+
+
+
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    colorByPoint: true,
+                    name: 'Browser share',
+                    //data: dataList
+                    data: [{
+                        name: answer1a,
+                        y: answer1
+                    }, {
+                        name: answer2a,
+                        y: answer2,
+                        sliced: true,
+                        selected: true
+                    }, {
+                        name: answer3a,
+                        y: answer3
+                    }, {
+                        name: answer4a,
+                        y: answer4
+                    }, {
+                        name: answer5a,
+                        y: answer5
+
+                    }]
+                }]
+            });
+        };
+
+        function RenderPieCharts(elementId, dataList) {
+            new Highcharts.Chart({
+                chart: {
+                    renderTo: elementId,
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                }, title: {
+                    text: 'Chưa có dữ liệu'
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            formatter: function () {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    name: 'Browser share',
+                    data: dataList
+                }]
+            });
+        };
+    });
+    function addCommentByAjax() {
+
+        var payload = {
+            model: {
+                // whatever properties you might have
+            },
+            choiceId: $("#anwser1").val()
+        };
+        $.ajax({
+            type: "POST",
+            url: '/Survey/DoDetailSurvey',
+            contentType: 'application/json',
+            data: JSON.stringify(payload)
+        });
+
+    }
+    //$('#btnComment').click(function () {
+    //    var choiceId = "1";
+
+    //    $.ajax({
+    //        url: '/Survey/DoDetailSurvey',
+    //        data: { 'choiceId': choiceId },
+    //        type: "Post",
+    //        cache: false,
+    //        success: function (response) {
+    //            //do something with response
+    //        },
+    //        error: function (xhr, ajaxOptions, thrownError) {
+    //            alert('error occured');
+    //        }
+    //    });
+    //});
+    //function addCommentByAjax() {
+    //    $.ajax({
+    //        type: "POST",
+    //        url: '/Survey/DoDetailSurvey',
+
+
+    //        data: {
+    //            choiceId: "1"
+    //        }
+
+
+    //    });
+    //}
+    $(function () {
+        $("#PublishDate").datepicker();
+        $("#PublishDate").attr('readOnly', 'true');
+    });
+    $(document).ready(function () {
+        $("#btnSave").click(function () {
+            $.ajax(
+            {
+                type: "POST", //HTTP POST Method
+                url: '/Survey/DoDetailSurvey', // Controller/View
+                data: { //Passing data
+                    choiceId: "aaaaa"//Reading text box values using Jquery
+
+
+                }
+
+            });
+
+        });
+    });
+</script>
+
+<script src="~/Scripts/jquery.validate.min.js"></script>

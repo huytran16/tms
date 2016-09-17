@@ -1,0 +1,913 @@
+﻿@using AMS.Constant
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Manage Balance Sheet Detail";
+    Layout = "~/Views/Management/__ManagementLayout.cshtml";
+    BalanceSheet bls = ViewBag.bls;
+}
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+
+        <div class="heading-tab">
+            <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Chi tiết bảng thu chi</span>
+            <ul class="nav nav-tabs pull-right" role="tablist">
+                <li>
+                    <a href="/Management/BalanceSheet/View"><i class="fa fa-tachometer"></i> Báo cáo thu chi</a>
+                </li>
+                <li class="active">
+                    <a href="/Management/BalanceSheet/ManageBalanceSheetView"><i class="fa fa-calculator"></i> Quản lý thu chi</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel-body">
+            <div class="tab-content">
+                <form class="form-horizontal" role="form">
+                    <div class="row">
+                        <div class="pull-right">
+                            @{
+                                if (bls.Status == SLIM_CONFIG.BALANCE_SHEET_OPEN)
+                                {
+                                    <span id="btnDuedate" class="btn btn-default">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i> Chỉnh sửa
+                                    </span>
+                                    <span id="assignHdReqBtn" class="btn btn-danger" onclick="openCloseBlsModal()">
+                                        Đóng
+                                    </span>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class=" form-group">
+                        <div class="col-md-6">
+                            <fieldset class="scheduler-border less-padding">
+                                <legend class="scheduler-border bold-black">Thông tin</legend>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="title" class="col-md-3 control-label">Tiêu đề</label>
+
+                                            <div class="col-md-9">
+                                                <input id="title" class="form-control" value="@bls.Title" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Từ ngày</label>
+                                            <div class="col-md-9">
+                                                <div class="input-group">
+                                                    @{
+                                                        if (@bls.CreateDate.Value.Date == DateTime.Today)
+                                                        {
+                                                            <input class="form-control" value="@bls.StartDate.Value.ToString(AmsConstants.DateFormat)" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input class="form-control" value="@bls.StartDate.Value.ToString(AmsConstants.DateFormat)" />
+                                                            <span class="input-group-addon">đến</span>
+                                                            <input class="form-control" value="@(bls.ClosingDate == null ? "Hôm nay" : bls.ClosingDate.Value.ToString(AmsConstants.DateFormat))" />
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="title" class="col-md-3 control-label">Trạng thái</label>
+                                            @{
+                                                if (bls.Status == SLIM_CONFIG.BALANCE_SHEET_CLOSE)
+                                                {
+                                                    <div class="col-md-9">
+                                                        <span class="btn btn-danger">Đóng</span>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-md-9">
+                                                        <span class="btn btn-info">Mở</span>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Cập nhật</label>
+                                            <div class="col-md-9">
+                                                <input id="lastUpdate" class="form-control" value="@bls.LastModified.Value.ToString(AmsConstants.DateTimeFormat)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                            </fieldset>
+                        </div>
+                        <div class="col-md-6" style="margin-top: 45px">
+
+                            <div class="table-responsive">
+                                <table class="table v-middle table-bordered table-condensed table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20%" rowspan="2">Tên</th>
+                                            <th colspan="4" class="text-capitalize text-center" style="background-color: #dddddd">
+                                                Bảng thu chi tháng @bls.StartDate.Value.ToString(AmsConstants.MonthYearFormat)
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th style="width: 20%;">Tồn</th>
+                                            <th style="width: 20%;">Tổng</th>
+                                            <th style="width: 20%;">Thực thu</th>
+                                            <th style="width: 20%;">Thực chi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Đầu kỳ</strong></td>
+                                            <td id="redudancyStartMonth" colspan="4"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Doanh thu</strong></td>
+                                            <td></td>
+                                            <td id="forecastIncome"></td>
+                                            <td id="actualIncome"></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Chi phí</strong></td>
+                                            <td></td>
+                                            <td id="forecastExpense"></td>
+                                            <td></td>
+                                            <td id="actualExpense"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Cuối kỳ</strong></td>
+                                            <td id="redudancyEndMonth" colspan="4"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+
+                        <div class="table-responsive">
+                            <table id="blsTransDetailTbl" data-bls-id="@bls.Id" data-bls-status="@bls.Status" class="table v-middle table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tên</th>
+                                        <th>Loại</th>
+                                        <th>Nhóm</th>
+                                        <th>Tháng</th>
+                                        <th>Tổng</th>
+                                        <th>Đã thanh toán</th>
+                                        <th>Ngày tạo</th>
+                                        <th class="text-right"></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tên</th>
+                                        <th>Loại</th>
+                                        <th>Nhóm</th>
+                                        <th>Tháng</th>
+                                        <th>Tổng</th>
+                                        <th>Đã thanh toán</th>
+                                        <th>Ngày tạo</th>
+                                        <th class="text-right"></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="addIncomeLineModal" class="modal fade ams-modal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 id="incomeLineModalTitle" class="modal-title">Thêm giao dịch</h4>
+            </div>
+            <form id="addIncomeLineForm" class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="panel-body">
+
+                        <div class="alert alert-info" id="successAddTransNotify" style="display: none">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span>Thêm giao dịch thành công.</span>
+                        </div>
+                        <div class="alert alert-danger" id="failedAddTransNotify" style="display: none">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span>Thêm giao dịch thất bại.</span>
+                        </div>
+                        <div class="alert alert-danger" id="failedAddTransWithMsgNotify" style="display: none">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span id="addTransMsg"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="transTitle" class="col-md-3 control-label">Tên </label>
+                            <div class="col-md-9">
+                                <input id="transTitle" type="text" name="TransTitle" class="form-control" value="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Loại </label>
+                            <div class="col-md-9">
+                                <label class="radio-inline">
+                                    <input type="radio" value="1" checked="checked" name="TransType" />Thu
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="2" name="TransType" />Chi
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="transCat" class="col-md-3 control-label">Nhóm </label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <select id="transCat" name="UtilSrvCatId" class="form-control" data-size="3"></select>
+                                    <span class="input-group-addon btn btn-stroke btn-info btn-sm" onclick="closePopupAndShowOther()"><i class="fa fa-plus"></i> Nhóm</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="transTotalAmount" class="col-md-3 control-label">Thanh toán</label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <input id="transPaidInMonthView" name="TransPaidInMonthView" type="text" class="form-control" value="">
+
+                                    <label for="transTotalAmount" class="control-label input-group-addon" style="color: #333333; font-weight: 600;">Tổng</label>
+                                    <input id="transTotalAmountView" name="TransTotalAmountView" type="text" class="form-control" value="">
+                                    <span class="input-group-addon">đồng</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="transDesc" class="col-md-3 control-label">Mô tả</label>
+                            <div class="col-md-9">
+                                <textarea id="transDesc" name="TransDesc" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <input type="hidden" id="transForMonth" name="TransStartDate" value="" />
+                        <input type="hidden" id="transPaidInMonthAmount" name="TransPaidAmount" value="" />
+                        <input type="hidden" id="transTotalAmount" name="TransTotalAmount" value="" />
+                        <input type="hidden" id="ReceiptId" name="ReceiptId" value="" />
+                        <input type="hidden" id="balanceSheetId" name="BalanceSheetId" value="@bls.Id" />
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    <button type="submit" id="addIncomeTrans" class="btn btn-info">Chấp nhận</button>
+                    <button type="submit" id="updateIncomeTrans" class="btn btn-info hide">Chấp nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="addTransactionTypeModal" class="modal fade ams-modal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 id="hdSrvModalTitle" class="modal-title">Thêm loại giao dịch</h4>
+            </div>
+            <form id="addTransactionTypeForm" class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="panel-body">
+
+                        <div class="alert alert-info" id="successAddTransTypeNotify" style="display: none">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span>Thêm loại giao dịch thành công.</span>
+                        </div>
+                        <div class="alert alert-danger" id="failedAddTransTypeNotify" style="display: none">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span>Thêm loại giao dịch thất bại.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="transCategoryName" class="col-md-3 control-label">Tên </label>
+                            <div class="col-md-9">
+                                <input id="transCategoryName" type="text" name="TransCategoryName" class="form-control" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    <span id="addHdSrv" onclick="addTransactionItemCat()" class="btn btn-info">Chấp nhận</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="closeMonthlyBalanceSheetModal" class="modal fade ams-modal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 id="" class="modal-title"> Đóng quản lý thu chi</h4>
+            </div>
+            <form id="closeMonthlyBalanceSheetForm" class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="panel-body">
+                        <div class="alert alert-info" id="successCloseBlsNotify" style="display: none">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span>Đóng bảng thu chi thành công.</span>
+                        </div>
+                        <div class="alert alert-danger" id="failedCloseBlsNotify" style="display: none">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <span>Đóng bảng thu chi thất bại.</span>
+                        </div>
+                        <div class="form-group text-center">
+                            <span>
+                                Đóng bảng thu chi "<strong id="blsTitle"></strong>". Mở tháng tiếp theo.
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <label for="nextMonthTitle" class="col-md-2 control-label"> Tiêu đề</label>
+                            <div class="col-md-10">
+                                <input id="nextMonthTitle" type="text" name="NextMonthTitle" class="form-control" value="">
+                            </div>
+                        </div>
+                        <input type="hidden" name="ThisMonthId" value="@bls.Id" />
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    <span onclick="closeBalanceSheet()" class="btn btn-info">Chấp nhận</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        window.deleteTransList = [];
+        var blsId = document.getElementById("blsTransDetailTbl").dataset.blsId;
+        window.listIncomeTable = $("#blsTransDetailTbl").DataTable({
+            "bLengthChange": false,
+            "bInfo": false,
+            "ajax": {
+                url: "/Management/BalanceSheet/GetIncomeTransItems?blsId=" + blsId,
+                dataSrc: function (data) {
+                    if (data.actualIncome) {
+                        $("#actualIncome").text(numberWithCommas(data.actualIncome));
+                    } else {
+                        $("#actualIncome").text("0");
+                    }
+
+                    if (data.actualExpense) {
+                        $("#actualExpense").text(numberWithCommas(data.actualExpense));
+                    }
+                    else {
+                        $("#actualExpense").text("0");
+                    }
+                    if (data.forecastExpense) {
+                        $("#forecastExpense").text(numberWithCommas(data.forecastExpense));
+                    }
+                    else {
+                        $("#forecastExpense").text("0");
+                    }
+                    if (data.forecastIncome) {
+                        $("#forecastIncome").text(numberWithCommas(data.forecastIncome));
+                    }
+                    else {
+                        $("#forecastIncome").text("0");
+                    }
+                    if (data.redudancyEndMonth) {
+                        $("#redudancyEndMonth").text(numberWithCommas(data.redudancyEndMonth));
+                    }
+                    else {
+                        $("#redudancyEndMonth").text("0");
+                    }
+                    if (data.redudancyStartMonth) {
+                        $("#redudancyStartMonth").text(numberWithCommas(data.redudancyStartMonth));
+                    }
+                    else {
+                        $("#redudancyStartMonth").text("0");
+                    }
+                    if (data.lastUpdate) {
+                        $("#lastUpdate").val(data.lastUpdate);
+                    } else {
+                        $("#lastUpdate").val("0");
+                    }
+                    if (data.balanceSheetId) {
+                        window.thisBalanceSheet = data.balanceSheetId;
+                    }
+                    window.listTransaction = data.data;
+                    return data.data;
+                }
+
+            },
+            rowId: 'ReceiptId',
+            "order": [[8, "desc"]],
+            "drawCallback": function (settings) {
+                var blsStatus = document.getElementById("blsTransDetailTbl").dataset.blsStatus;
+                if (blsStatus != "@SLIM_CONFIG.BALANCE_SHEET_CLOSE") {
+                    var addBtn = "<div class='col-md-1'>" +
+                                    "<span class='btn btn-info' onclick='openAddIncomeLineModal()'>" +
+                                    "<i class='fa fa-plus'></i>" +
+                                    "</span>" +
+                                "</div>";
+                    $("#blsTransDetailTbl_wrapper > div:nth-child(1) > div:nth-child(1)").html(addBtn);
+                }
+
+                var deleteBtn =
+            "<div class='hide' id='delHdSrvBtnGroup'>" +
+                "<span class='btn btn-warning btn-stroke' onclick='cancelDeleteTrans()'>" +
+                    "Hủy" +
+                "</span>" +
+                "<span class='btn btn-primary' style='margin-left: 5px' onclick='commitDeleteTrans()'>" +
+                    "Chấp nhận" +
+                "</span>" +
+            "</div>";
+                $("#blsTransDetailTbl_wrapper > div.row:nth-child(3) > div:nth-child(1) ").html(deleteBtn);
+            },
+            "columns": [
+                { data: "TransTitle" },
+                { data: "TransTitle" },
+                { data: "TransType" },
+                { data: "UtilSrvCatName" },
+                { data: "TransStartDate" },
+                { data: "TransTotalAmount" },
+                { data: "TransPaidAmount" },
+                { data: "TransCreateDate" },
+                { data: "TransactionId" }
+            ],
+            "columnDefs": [
+                {
+                    "searchable": false,
+                    "orderable": false,
+                    "targets": 0
+                },
+                {
+                    "targets": 2,
+                    "data": "TransType",
+                    "render": function (data, type, full, meta) {
+                        if (type === "display" || type === "filter") {
+                            if (data === window.Transaction_Type_Income) {
+                                return "<span class='btn btn-success btn-xs' style='margin-right: 5px'>Thu</span>";
+                            } else {
+                                return "<span class='btn btn-warning btn-xs' style='margin-right: 5px'>Chi</span>";
+                            }
+
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "targets": 4,
+                    "data": "TransStartDate",
+                    "render": function (data, type, full, meta) {
+                        if (type === "display" || type === "filter") {
+                            var dateMonth = data.split("-");
+
+                            return "<td>" +
+                                "<span class='label date-color' style='margin-right: 5px'>" + dateMonth[0] + "</span>" +
+                                "<span class='label time-color'>" + +dateMonth[1] + "</span>" +
+                                "</td>";
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "targets": 5,
+                    "data": "TransTotalAmount",
+                    "render": function (data, type, full, meta) {
+                        if (type === "display" || type === "filter") {
+                            return numberWithCommas(data);
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "targets": 6,
+                    "data": "TransPaidAmount",
+                    "render": function (data, type, full, meta) {
+                        if (type === "display" || type === "filter") {
+                            return numberWithCommas(data);
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "targets": 8,
+                    "searchable": false,
+                    "orderable": false,
+                    "width": "7%",
+                    "data": "TransactionId",
+                    "render": function (data, type, full, meta) {
+                        if (type === "display" || type === "filter") {
+                            if (full.TransEditable === -1) {
+                                return "<div class='text-right'>" +
+                                " <span onclick='openViewIncomeLineModal(\"" + data + "\",\"" + full.UtilSrvCatId + "\")' class='btn btn-info btn-stroke btn-xs'> " +
+                                " <i class='fa fa-info'></i> " +
+                                " </span> " +
+                                " </div>";
+                            } else if (full.TransEditable === 1) {
+                                return "<div class='text-right'>" +
+                                " <span onclick='openUpdateIncomeLineModal(\"" + data + "\",\"" + full.UtilSrvCatId + "\")' class='btn btn-default btn-xs'> " +
+                                " <i class='fa fa-pencil'></i> " +
+                                " </span> " +
+                                " <span href='#' class='btn btn-danger btn-xs' onclick='deleteTrans(\"" + data + "\")'> " +
+                                "    <i class='fa fa-times'></i> " +
+                                "  </span> " +
+                                " </div>";
+                            }
+                            return "<div class='text-right'>" +
+                                " <span class='btn btn-info btn-stroke btn-xs'> " +
+                                " <i class='fa fa-info'></i> " +
+                                " </span> " +
+                                " </div>";
+                        }
+                        return data;
+                    }
+                },
+            ]
+        });
+        generateTableIndex(listIncomeTable);
+
+        $("#addIncomeLineModal").on("hidden.bs.modal", function () {
+            resetFormData("addIncomeLineForm");
+        });
+        $("#addTransactionTypeModal").on("hidden.bs.modal", function () {
+            resetFormData("addTransactionTypeForm");
+        });
+
+        bindingNumberWithComma("transTotalAmountView");
+        bindingNumberWithComma("transPaidInMonthView");
+        validateAddNewInComeLine();
+    });
+
+    function closePopupAndShowOther() {
+        $("#addIncomeLineModal").modal("hide");
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        setTimeout(function () {
+            $("#addTransactionTypeModal").modal("show");
+        }, 500);
+    }
+
+    function addTransactionItemCat() {
+        $.ajax({
+            "url": "/Management/BalanceSheet/AddTransactionType",
+            "type": "POST",
+            "data": $("#addTransactionTypeForm").serialize(),
+            "success": function (data) {
+                if (data.StatusCode === 0) {
+                    $("#successAddTransTypeNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#successAddTransTypeNotify").fadeOut("slow");
+                        resetFormData("addTransactionTypeForm");
+                    }, 3000);
+                }
+            }
+        });
+    }
+    function getTransactionItemCat(type, id, callback) {
+        $.ajax({
+            type: "GET",
+            url: "/Management/BalanceSheet/GetAllTransactionType?type=" + type,
+            success: function (data) {
+                if (data.StatusCode === 0) {
+                    var obj = data.Data;
+                    var selectTagInHTML = parseJsonToSelectTags(obj, id, "-----Hãy chọn nhóm chi tiêu-----");
+                    callback(selectTagInHTML);
+                }
+            }
+        });
+    }
+    function openAddIncomeLineModal() {
+        getTransactionItemCat(1, -1, function (data) {
+            $("#transCat").html(data);
+            $("#updateIncomeTrans").removeClass("hide").addClass("hide");
+            $("#addIncomeTrans").removeClass("hide");
+
+            $("#incomeLineModalTitle").text("Thêm giao dịch");
+            $("#successAddTransNotify").text("Thêm giao dịch thành công");
+            $("#failedAddTransTypeNotify").text("Thêm giao dịch thất bại");
+
+            $("#addIncomeLineModal").modal("show");
+        });
+    }
+    function openUpdateIncomeLineModal(id, utilSrvId) {
+        getTransItemDetail(id, utilSrvId, function (data) {
+            $("#transCat").html(data);
+
+            $("#addIncomeTrans").removeClass("hide").addClass("hide");
+            $("#updateIncomeTrans").removeClass("hide");
+
+            $("#incomeLineModalTitle").text("Cập nhật giao dịch");
+            $("#successAddTransNotify").text("Cập nhật giao dịch thành công");
+            $("#failedAddTransTypeNotify").text("Cập nhật giao dịch thất bại");
+
+            $("#addIncomeLineModal").modal("show");
+        });
+    }
+
+    function openViewIncomeLineModal(id, utilSrvId) {
+        getTransItemDetail(id, utilSrvId, function (data) {
+            $("#transCat").html(data);
+
+            $("#addIncomeTrans").removeClass("hide").addClass("hide");
+            $("#updateIncomeTrans").removeClass("hide").addClass("hide");
+            $("#incomeLineModalTitle").text("Thông tin giao dịch");
+
+            $("#addIncomeLineModal").modal("show");
+        });
+    }
+    function getTransItemDetail(id, utilSrvId, callback) {
+        $.ajax({
+            url: "/Management/BalanceSheet/GetTransItemDetail",
+            type: "GET",
+            data: {
+                transId: id,
+                blsId: window.thisBalanceSheet,
+                utilSrvCatId: utilSrvId
+            },
+            success: function (data) {
+                var obj = data.Data;
+                $("#transTitle").val(obj.TransTitle);
+                $("#transCat").val(obj.UtilSrvCatName);
+                $("#BalanceSheetForMonthView").val(obj.TransStartDate);
+                $("#transTotalAmountView").val(numberWithCommas(obj.TransTotalAmount));
+                $("#transPaidInMonthView").val(numberWithCommas(obj.TransPaidInMonthAmount));
+                $("#transPaidAmountView").val(numberWithCommas(obj.TransPaidAmount));
+                $("#transDesc").val(obj.TransDesc);
+                $("#ReceiptId").val(obj.ReceiptId);
+                var dbId = obj.TransType;
+                $("input:radio[name=TransType]").filter("[value=" + dbId + "]").prop("checked", "true");
+
+                getTransactionItemCat(1, obj.UtilSrvCatId, function (data) {
+                    callback(data);
+                });
+            }
+        });
+    }
+
+
+    function updateIncomeTransaction() {
+        var forMounth = "01-" + $("#BalanceSheetForMonthView").val();
+        $("#transForMonth").val(forMounth);
+
+        var transTotalAmount = replaceCommaNumber($("#transTotalAmountView").val());
+        var transPaidAmount = replaceCommaNumber($("#transPaidInMonthView").val());
+        $("#transTotalAmount").val(transTotalAmount);
+        $("#transPaidInMonthAmount").val(transPaidAmount);
+
+        $.ajax({
+            url: "/Management/BalanceSheet/UpdateTransactionItem",
+            type: "POST",
+            data: $("#addIncomeLineForm").serialize(),
+            success: function (data) {
+                if (data.StatusCode === 0) {
+                    $("#successAddTransNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        resetFormData("addIncomeLineForm");
+                        $("#successAddTransNotify").fadeOut("slow");
+                        $("#addIncomeLineModal").modal("hide");
+                    }, 3000);
+                    window.listIncomeTable.ajax.reload(null, false);
+                } else if (data.StatusCode === 2) {
+                    $("#addTransMsg").text("Không tìm thấy giao dịch");
+                    $("#failedAddTransWithMsgNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#failedAddTransWithMsgNotify").fadeOut("slow");
+                    }, 3000);
+                } else if (data.StatusCode === 3) {
+                    $("#addTransMsg").text("Bảng thu chi đã đóng");
+                    $("#failedAddTransWithMsgNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#failedAddTransWithMsgNotify").fadeOut("slow");
+                    }, 3000);
+                } else {
+                    $("#failedAddTransNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#failedAddTransNotify").fadeOut("slow");
+                    }, 3000);
+                }
+                console.log(data);
+            }
+        });
+        //        $("#transForMonth").val("");
+        //        $("#transTotalAmount").val("");
+        //        $("#transPaidAmount").val("");
+    }
+
+    function addIncomeTransaction() {
+        var forMounth = "01-" + $("#BalanceSheetForMonthView").val();
+        $("#transForMonth").val(forMounth);
+
+        var transTotalAmount = replaceCommaNumber($("#transTotalAmountView").val());
+        var transPaidAmount = replaceCommaNumber($("#transPaidInMonthView").val());
+        $("#transTotalAmount").val(transTotalAmount);
+        $("#transPaidInMonthAmount").val(transPaidAmount);
+
+        $.ajax({
+            url: "/Management/BalanceSheet/AddTransactionItem",
+            type: "POST",
+            data: $("#addIncomeLineForm").serialize(),
+            success: function (data) {
+                if (data.StatusCode === 0) {
+                    $("#successAddTransNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#successAddTransNotify").fadeOut("slow");
+                    }, 3000);
+                    resetFormData("addIncomeLineForm");
+                    window.listIncomeTable.ajax.reload(null, false);
+                } else if (data.StatusCode === 2) {
+                    $("#addTransMsg").text("Không tìm thấy giao dịch");
+                    $("#failedAddTransWithMsgNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#failedAddTransWithMsgNotify").fadeOut("slow");
+                    }, 3000);
+                } else if (data.StatusCode === 3) {
+                    $("#addTransMsg").text("Bảng thu chi đã đóng");
+                    $("#failedAddTransWithMsgNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#failedAddTransWithMsgNotify").fadeOut("slow");
+                    }, 3000);
+                } else {
+                    $("#failedAddTransNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#failedAddTransNotify").fadeOut("slow");
+                    }, 3000);
+                }
+                console.log(data);
+            }
+        });
+        $("#transForMonth").val("");
+    }
+    function openCloseBlsModal() {
+        $("#blsTitle").text($("#title").val());
+        $("#closeMonthlyBalanceSheetModal").modal("show");
+    }
+
+    function deleteTrans(id) {
+        //        var element = $("#receipt_id_" + id).addClass("hide");
+        window.deleteTransList.push(parseInt(id));
+        window.listIncomeTable.row("#trans_" + id).remove().draw(false);
+        $("#delHdSrvBtnGroup").removeClass("hide").addClass("show");
+    }
+    function cancelDeleteTrans() {
+        for (var i = 0; i < window.listTransaction.length; i++) {
+            var originItem = window.listTransaction[i];
+            for (var z = 0; z < window.deleteTransList.length; z++) {
+                var deleteItem = window.deleteTransList[z];
+                if (originItem.TransactionId === deleteItem) {
+                    window.listIncomeTable.row.add(originItem).draw();
+                }
+            }
+        }
+        window.deleteTransList = new Array();
+        $("#delHdSrvBtnGroup").removeClass("show").addClass("hide");;
+    }
+
+    function commitDeleteTrans() {
+        var blsId = document.getElementById("blsTransDetailTbl").dataset.blsId;
+        var postData = {
+            listTransaction: window.deleteTransList,
+            balanceSheetId: blsId
+        }
+        $.ajax({
+            url: "/Management/BalanceSheet/DeleteTransactions",
+            type: "post",
+            data: postData,
+            dataType: "json",
+            traditional: true,
+            success: function (data) {
+                reloadHdSrvTable();
+                if (data.StatusCode === 0) {
+                    window.listIncomeTable.ajax.reload(null, false);
+                    window.deleteHdSrvList = new Array();
+                } else {
+                    $("#delHdSrvBtnGroup").removeClass("show");
+                    $("#delHdSrvBtnGroup").addClass("hide");
+                    $("#messageModal .msgContent").text("Xóa dịch vụ hỗ trợ thất bại!");
+                }
+            },
+            error: function () {
+
+            }
+        });
+    }
+    function closeBalanceSheet() {
+        $.ajax({
+            type: "POST",
+            url: "/Management/BalanceSheet/CloseBalanceSheet",
+            data: $("#closeMonthlyBalanceSheetForm").serialize(),
+            success: function (data) {
+                if (data.StatusCode === 0) {
+                    $("#successCloseBlsNotify").fadeIn("slow");
+                    resetFormData("closeMonthlyBalanceSheetForm");
+                    setTimeout(function () {
+                        $("#successCloseBlsNotify").fadeOut("slow");
+                        location.href = "/Management/BalanceSheet/ManageBalanceSheetView";
+                    }, 3000);
+                } else {
+                    $("#failedCloseBlsNotify").fadeIn("slow");
+                    setTimeout(function () {
+                        $("#failedCloseBlsNotify").fadeOut("slow");
+                    }, 3000);
+                }
+            }
+        });
+    }
+    function validateAddNewInComeLine() {
+        /*        $.validator.setDefaults({
+        //            highlight: function (element) {
+        //                $(element).closest('.form-group').addClass('has-error');
+        //            },
+        //            unhighlight: function (element) {
+        //                $(element).closest('.form-group').removeClass('has-error');
+        //            },
+        //            errorElement: 'span',
+        //            errorClass: 'help-block',
+                    errorPlacement: function (error, element) {
+
+                    }
+                });*/
+
+        $.validator.addMethod('compareValue', function (value, element, param) {
+            value = replaceCommaNumber(value);
+            var paramValue = replaceCommaNumber($(param).val());
+            return this.optional(element) || parseInt(value) >= paramValue;
+        }, 'Invalid value');
+
+        $("#addIncomeLineForm").validate({
+            rules: {
+                TransTitle: {
+                    required: true,
+                    maxlength: 255
+                },
+                TransPaidInMonthView: {
+                    required: true,
+                    maxlength: 15
+                },
+                TransTotalAmountView: {
+                    required: true,
+                    maxlength: 15,
+                    compareValue: "#transPaidInMonthView"
+                },
+                TransDesc: {
+                    maxlength: 1000
+                }
+            },
+            messages: {
+                TransTitle: {
+                    required: "Trường bắt buộc",
+                    maxlength: "Tối đa 255 ký tự."
+                },
+                TransPaidInMonthView: {
+                    required: "Trường bắt buộc",
+                    maxlength: "Tối đa 12 ký số.",
+                },
+                TransTotalAmountView: {
+                    required: "Trường bắt buộc",
+                    maxlength: "Tối đa 12 ký số.",
+                    compareValue: "Tổng phải lớn hơn đẵ thanh toán"
+                },
+                TransDesc: {
+                    maxlength: "Tối đa 1000 ký tự."
+                }
+            },
+            submitHandler: function () {
+                if ($("#updateIncomeTrans").hasClass("hide")) {
+                    addIncomeTransaction();
+                } else {
+                    updateIncomeTransaction();
+                }
+            },
+            errorPlacement: function (error, element) {
+                if (element.parent('.input-group').length) {
+                    if (!element.parent().next().hasClass("error") || element.parent().next().css("display") == "none") {
+                        error.insertAfter(element.parent());
+                    }
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            showErrors: function (errorMap, errorList) {
+                for (var i = 0; errorList[i]; i++) {
+                    var element = this.errorList[i].element;
+                    //solves the problem with brute force
+                    //remove existing error label and thus force plugin to recreate it
+                    //recreation == call to errorplacement function
+                    this.errorsFor(element).remove();
+                }
+                this.defaultShowErrors();
+            }
+        });
+    }
+</script>

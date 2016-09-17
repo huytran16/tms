@@ -1,0 +1,173 @@
+﻿@{
+    ViewBag.Title = "ManageHouseBlock";
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+
+    bool isManager = User.IsInRole("Manager");
+
+    if (isManager)
+    {
+        Layout = "~/Views/Management/__ManagementLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    }
+}
+@if (!isManager)
+{
+    <link href="~/Content/css/adminCustom.css" rel="stylesheet" />
+}
+<div class="col-md-12">
+    <div class="panel panel-default">
+        @{
+            if (isManager)
+            {
+                <div class="heading-tab">
+                    <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Chi tiết tòa nhà</span>
+                    <ul class="nav nav-tabs pull-right" role="tablist">
+                        <li class="active">
+                            <a href="/Management/Config/UtilityService/ViewManageHouseBlock"><i class="fa fa-search-plus"></i> Căn hộ</a>
+                        </li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="heading-tab admin">
+                    <span class="tab-location"><i class="fa fa-sitemap" aria-hidden="true"></i> Quản lý tòa nhà</span>
+
+                    <ul class="nav nav-tabs pull-right" role="tablist">
+                        <li class="active">
+                            <a href="/Management/Config/UtilityService/ViewManageHouseBlock"><i class="fa fa-home"></i> Căn hộ</a>
+                        </li>
+                        <li>
+                            <a href="/Management/Config/UtilityService/View"><i class="fa fa-usd"></i> Phí sinh họat</a>
+                        </li>
+                        <li>
+                            <a href="/Management/ViewHelpdeskServiceCategory"><i class="fa fa-wrench"></i> Nhóm DV sửa chữa</a>
+                        </li>
+                        <li class="">
+                            <a href="/Management/BalanceSheet/ManageTransactionCatView"><i class="fa fa-tags"></i> Nhóm thu chi</a>
+                        </li>
+                    </ul>
+                </div>
+            }
+        }
+
+        <div class="panel-body">
+
+            <div class="tab-content">
+                <div class="tab-pane fade active in" id="">
+
+                    <div class="form-horizontal" role="form">
+                        <table id="managerBlockTbl" class="table table-hover table-bordered" data-is-manager="@isManager">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tên</th>
+                                    <th>Tổng số căn hộ</th>
+                                    <th>Số hộ đang cư trú</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tên</th>
+                                    <th>Tổng số căn hộ</th>
+                                    <th>Số hộ đang cư trú</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        window.houseInBlockTbl = $("#managerBlockTbl").DataTable({
+            "ajax": {
+                url: "/Management/Config/UtilityService/GetBlockList",
+                dataSrc: function (data) {
+                    return data;
+                }
+            },
+            "destroy": true,
+            "bLengthChange": false,
+            "bInfo": false,
+            "drawCallback": function (settings) {
+                var addBtn = "";
+                var isManager = $("#managerBlockTbl").data("isManager");
+                if (isManager == "False") {
+                    addBtn = "<div class='col-md-1'>" +
+                        "<a id='createFirstBlsBtn' class='btn btn-primary' href='/Management/Config/UtilityService/ViewCreateHouseBlock' >" +
+                        "<i class='fa fa-plus'></i>" +
+                        "</a>" +
+                        "</div>";
+                    $("#managerBlockTbl_wrapper > div:nth-child(1) > div:nth-child(1)").html(addBtn);
+                }
+            },
+            "order": [[1, "asc"]],
+            "columns": [
+            { data: "Name" },
+            { data: "Name" },
+            { data: "TotalRoom" },
+            { data: "TotalActiveRoom" },
+            { data: "Id" }
+            ],
+            "columnDefs": [
+            {
+                "searchable": false,
+                "orderable": false,
+                "targets": 0
+            },
+            {
+                "targets": 1,
+                "render": function (data, type, full, meta) {
+                    if (type === "display" || type === "filter") {
+                        return "<strong class='text-right'>" +
+                        data +
+                        " </strong>";
+                    }
+                    return data;
+                }
+            },
+            {
+                "targets": 3,
+                "render": function (data, type, full, meta) {
+                    if (type === "display" || type === "filter") {
+                        return "<strong class='text-right'>" +
+                        data +
+                        " </strong>";
+                    }
+                    return data;
+                }
+            },
+            {
+                "targets": 4,
+                "render": function (data, type, full, meta) {
+                    if (type === "display" || type === "filter") {
+                        return "<div class='text-right'>" +
+                        "<span onclick='viewBlockInfo(\"" + data + "\")' class='btn btn-default btn-xs'>" +
+                        " <i class='fa fa-pencil'></i>" +
+                        "</span>" +
+                        " </div>";
+
+                    }
+                    return data;
+                }
+            }
+            ]
+        });
+        generateTableIndex(window.houseInBlockTbl);
+    });
+
+    function viewBlockInfo(id) {
+        location.href = "/Management/Config/UtilityService/ViewHousesInBlock?blockId=" + id;
+    }
+</script>
