@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="TmsCapstoneDBModelStoreContainer" CdmEntityContainer="TmsCapstoneDBEntities">
+    <EntitySetMapping Name="BusinessRules">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.BusinessRule">
+        <MappingFragment StoreEntitySet="BusinessRule">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="BusinessRuleConditions">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.BusinessRuleCondition">
+        <MappingFragment StoreEntitySet="BusinessRuleCondition">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="Criteria" ColumnName="Criteria" />
+          <ScalarProperty Name="Condition" ColumnName="Condition" />
+          <ScalarProperty Name="Value" ColumnName="Value" />
+          <ScalarProperty Name="BusinessRuleID" ColumnName="BusinessRuleID" />
+          <ScalarProperty Name="BusinessRuleConditionID" ColumnName="BusinessRuleConditionID" />
+          <ScalarProperty Name="BusinessRuleConditionLevel" ColumnName="BusinessRuleConditionLevel" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="BusinessRuleNotifications">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.BusinessRuleNotification">
+        <MappingFragment StoreEntitySet="BusinessRuleNotification">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="BusinessRuleID" ColumnName="BusinessRuleID" />
+          <ScalarProperty Name="ReceiverID" ColumnName="ReceiverID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="BusinessRuleTriggers">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.BusinessRuleTrigger">
+        <MappingFragment StoreEntitySet="BusinessRuleTrigger">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Action" ColumnName="Action" />
+          <ScalarProperty Name="Value" ColumnName="Value" />
+          <ScalarProperty Name="BusinessRuleID" ColumnName="BusinessRuleID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Categories">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.Category">
+        <MappingFragment StoreEntitySet="Category">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="ParentID" ColumnName="ParentID" />
+          <ScalarProperty Name="CategoryLevel" ColumnName="CategoryLevel" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Departments">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.Department">
+        <MappingFragment StoreEntitySet="Department">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Impacts">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.Impact">
+        <MappingFragment StoreEntitySet="Impact">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="KnowledgeBases">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.KnowledgeBase">
+        <MappingFragment StoreEntitySet="KnowledgeBase">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Subject" ColumnName="Subject" />
+          <ScalarProperty Name="ContentText" ColumnName="ContentText" />
+          <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+          <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+          <ScalarProperty Name="CreatedTime" ColumnName="CreatedTime" />
+          <ScalarProperty Name="ModifiedTime" ColumnName="ModifiedTime" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Priorities">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.Priority">
+        <MappingFragment StoreEntitySet="Priority">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="PriorityMatrixItems">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.PriorityMatrixItem">
+        <MappingFragment StoreEntitySet="PriorityMatrixItem">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="ImpactID" ColumnName="ImpactID" />
+          <ScalarProperty Name="UrgencyID" ColumnName="UrgencyID" />
+          <ScalarProperty Name="PriorityID" ColumnName="PriorityID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Tickets">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.Ticket">
+        <MappingFragment StoreEntitySet="Ticket">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="Mode" ColumnName="Mode" />
+          <ScalarProperty Name="SolveID" ColumnName="SolveID" />
+          <ScalarProperty Name="TechnicianID" ColumnName="TechnicianID" />
+          <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
+          <ScalarProperty Name="RequesterID" ColumnName="RequesterID" />
+          <ScalarProperty Name="ImpactID" ColumnName="ImpactID" />
+          <ScalarProperty Name="ImpactDetail" ColumnName="ImpactDetail" />
+          <ScalarProperty Name="UrgencyID" ColumnName="UrgencyID" />
+          <ScalarProperty Name="PriorityID" ColumnName="PriorityID" />
+          <ScalarProperty Name="CategoryID" ColumnName="CategoryID" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="Subject" ColumnName="Subject" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="Solution" ColumnName="Solution" />
+          <ScalarProperty Name="UnapproveReason" ColumnName="UnapproveReason" />
+          <ScalarProperty Name="ScheduleStartDate" ColumnName="ScheduleStartDate" />
+          <ScalarProperty Name="ScheduleEndDate" ColumnName="ScheduleEndDate" />
+          <ScalarProperty Name="ActualStartDate" ColumnName="ActualStartDate" />
+          <ScalarProperty Name="ActualEndDate" ColumnName="ActualEndDate" />
+          <ScalarProperty Name="SolvedDate" ColumnName="SolvedDate" />
+          <ScalarProperty Name="CreatedTime" ColumnName="CreatedTime" />
+          <ScalarProperty Name="ModifiedTime" ColumnName="ModifiedTime" />
+          <ScalarProperty Name="CreatedID" ColumnName="CreatedID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TicketAttachments">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.TicketAttachment">
+        <MappingFragment StoreEntitySet="TicketAttachment">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Path" ColumnName="Path" />
+          <ScalarProperty Name="TicketID" ColumnName="TicketID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TicketHistories">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.TicketHistory">
+        <MappingFragment StoreEntitySet="TicketHistory">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="ActID" ColumnName="ActID" />
+          <ScalarProperty Name="ActedID" ColumnName="ActedID" />
+          <ScalarProperty Name="Action" ColumnName="Action" />
+          <ScalarProperty Name="ActedTime" ColumnName="ActedTime" />
+          <ScalarProperty Name="TicketID" ColumnName="TicketID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Urgencies">
+      <EntityTypeMapping TypeName="TmsCapstoneDBModel.Urgency">
+        <MappingFragment StoreEntitySet="Urgency">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

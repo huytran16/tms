@@ -1,0 +1,430 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="TmsCapstoneDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="BusinessRule">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="100" />
+    <Property Name="Description" Type="nvarchar" MaxLength="255" />
+    <Property Name="IsActive" Type="bit" />
+  </EntityType>
+  <EntityType Name="BusinessRuleCondition">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Type" Type="int" />
+    <Property Name="Criteria" Type="nvarchar" MaxLength="50" />
+    <Property Name="Condition" Type="int" />
+    <Property Name="Value" Type="nvarchar" MaxLength="100" />
+    <Property Name="BusinessRuleID" Type="int" />
+    <Property Name="BusinessRuleConditionID" Type="int" />
+    <Property Name="BusinessRuleConditionLevel" Type="int" />
+  </EntityType>
+  <EntityType Name="BusinessRuleNotification">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="BusinessRuleID" Type="int" />
+    <Property Name="ReceiverID" Type="int" />
+  </EntityType>
+  <EntityType Name="BusinessRuleTrigger">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Action" Type="int" />
+    <Property Name="Value" Type="int" />
+    <Property Name="BusinessRuleID" Type="int" />
+  </EntityType>
+  <EntityType Name="Category">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="100" />
+    <Property Name="ParentID" Type="int" />
+    <Property Name="CategoryLevel" Type="int" />
+    <Property Name="IsActive" Type="bit" />
+  </EntityType>
+  <EntityType Name="Department">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="100" Nullable="false" />
+    <Property Name="Description" Type="nvarchar" MaxLength="255" />
+    <Property Name="IsActive" Type="bit" />
+  </EntityType>
+  <EntityType Name="Impact">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="100" />
+    <Property Name="Description" Type="nvarchar" MaxLength="255" />
+    <Property Name="IsActive" Type="bit" />
+  </EntityType>
+  <EntityType Name="KnowledgeBase">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Subject" Type="nvarchar" MaxLength="100" Nullable="false" />
+    <Property Name="ContentText" Type="nvarchar(max)" />
+    <Property Name="CategoryID" Type="int" />
+    <Property Name="IsDeleted" Type="bit" />
+    <Property Name="CreatedTime" Type="datetime" />
+    <Property Name="ModifiedTime" Type="datetime" />
+  </EntityType>
+  <EntityType Name="Priority">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="100" />
+    <Property Name="Description" Type="nvarchar" MaxLength="255" />
+    <Property Name="IsActive" Type="bit" />
+  </EntityType>
+  <EntityType Name="PriorityMatrixItem">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ImpactID" Type="int" Nullable="false" />
+    <Property Name="UrgencyID" Type="int" Nullable="false" />
+    <Property Name="PriorityID" Type="int" />
+  </EntityType>
+  <EntityType Name="Ticket">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Type" Type="int" />
+    <Property Name="Mode" Type="int" Nullable="false" />
+    <Property Name="SolveID" Type="int" />
+    <Property Name="TechnicianID" Type="int" />
+    <Property Name="DepartmentID" Type="int" />
+    <Property Name="RequesterID" Type="int" />
+    <Property Name="ImpactID" Type="int" />
+    <Property Name="ImpactDetail" Type="nvarchar" MaxLength="255" />
+    <Property Name="UrgencyID" Type="int" />
+    <Property Name="PriorityID" Type="int" />
+    <Property Name="CategoryID" Type="int" />
+    <Property Name="Status" Type="int" />
+    <Property Name="Subject" Type="nvarchar" MaxLength="100" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" />
+    <Property Name="Solution" Type="nvarchar(max)" />
+    <Property Name="UnapproveReason" Type="nvarchar(max)" />
+    <Property Name="ScheduleStartDate" Type="date" />
+    <Property Name="ScheduleEndDate" Type="date" />
+    <Property Name="ActualStartDate" Type="date" />
+    <Property Name="ActualEndDate" Type="date" />
+    <Property Name="SolvedDate" Type="date" />
+    <Property Name="CreatedTime" Type="datetime" />
+    <Property Name="ModifiedTime" Type="datetime" />
+    <Property Name="CreatedID" Type="int" />
+  </EntityType>
+  <EntityType Name="TicketAttachment">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Path" Type="nvarchar" MaxLength="255" />
+    <Property Name="TicketID" Type="int" />
+  </EntityType>
+  <EntityType Name="TicketHistory">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ActID" Type="int" />
+    <Property Name="ActedID" Type="int" />
+    <Property Name="Action" Type="nvarchar(max)" />
+    <Property Name="ActedTime" Type="datetime" />
+    <Property Name="TicketID" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Urgency">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" MaxLength="100" />
+    <Property Name="Description" Type="nvarchar" MaxLength="255" />
+    <Property Name="IsActive" Type="bit" />
+  </EntityType>
+  <Association Name="FK_BusinessRuleCondition_BusinessRule">
+    <End Role="BusinessRule" Type="Self.BusinessRule" Multiplicity="0..1" />
+    <End Role="BusinessRuleCondition" Type="Self.BusinessRuleCondition" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="BusinessRule">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="BusinessRuleCondition">
+        <PropertyRef Name="BusinessRuleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_BusinessRuleCondition_BusinessRuleCondition">
+    <End Role="BusinessRuleCondition" Type="Self.BusinessRuleCondition" Multiplicity="0..1" />
+    <End Role="BusinessRuleCondition1" Type="Self.BusinessRuleCondition" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="BusinessRuleCondition">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="BusinessRuleCondition1">
+        <PropertyRef Name="BusinessRuleConditionID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_BusinessRuleNotification_BusinessRule">
+    <End Role="BusinessRule" Type="Self.BusinessRule" Multiplicity="0..1" />
+    <End Role="BusinessRuleNotification" Type="Self.BusinessRuleNotification" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="BusinessRule">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="BusinessRuleNotification">
+        <PropertyRef Name="BusinessRuleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_BusinessRuleTrigger_BusinessRule">
+    <End Role="BusinessRule" Type="Self.BusinessRule" Multiplicity="0..1" />
+    <End Role="BusinessRuleTrigger" Type="Self.BusinessRuleTrigger" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="BusinessRule">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="BusinessRuleTrigger">
+        <PropertyRef Name="BusinessRuleID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Category_Category">
+    <End Role="Category" Type="Self.Category" Multiplicity="0..1" />
+    <End Role="Category1" Type="Self.Category" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Category">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Category1">
+        <PropertyRef Name="ParentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_KnowledgeBase_Category">
+    <End Role="Category" Type="Self.Category" Multiplicity="0..1" />
+    <End Role="KnowledgeBase" Type="Self.KnowledgeBase" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Category">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="KnowledgeBase">
+        <PropertyRef Name="CategoryID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PriorityMatrixItem_Impact">
+    <End Role="Impact" Type="Self.Impact" Multiplicity="1" />
+    <End Role="PriorityMatrixItem" Type="Self.PriorityMatrixItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Impact">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="PriorityMatrixItem">
+        <PropertyRef Name="ImpactID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PriorityMatrixItem_Priority">
+    <End Role="Priority" Type="Self.Priority" Multiplicity="0..1" />
+    <End Role="PriorityMatrixItem" Type="Self.PriorityMatrixItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Priority">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="PriorityMatrixItem">
+        <PropertyRef Name="PriorityID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PriorityMatrixItem_Urgency1">
+    <End Role="Urgency" Type="Self.Urgency" Multiplicity="1" />
+    <End Role="PriorityMatrixItem" Type="Self.PriorityMatrixItem" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Urgency">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="PriorityMatrixItem">
+        <PropertyRef Name="UrgencyID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ticket_Category">
+    <End Role="Category" Type="Self.Category" Multiplicity="0..1" />
+    <End Role="Ticket" Type="Self.Ticket" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Category">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Ticket">
+        <PropertyRef Name="CategoryID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ticket_Department">
+    <End Role="Department" Type="Self.Department" Multiplicity="0..1" />
+    <End Role="Ticket" Type="Self.Ticket" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Department">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Ticket">
+        <PropertyRef Name="DepartmentID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ticket_Impact">
+    <End Role="Impact" Type="Self.Impact" Multiplicity="0..1" />
+    <End Role="Ticket" Type="Self.Ticket" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Impact">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Ticket">
+        <PropertyRef Name="ImpactID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ticket_Priority">
+    <End Role="Priority" Type="Self.Priority" Multiplicity="0..1" />
+    <End Role="Ticket" Type="Self.Ticket" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Priority">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Ticket">
+        <PropertyRef Name="PriorityID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Ticket_Urgency">
+    <End Role="Urgency" Type="Self.Urgency" Multiplicity="0..1" />
+    <End Role="Ticket" Type="Self.Ticket" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Urgency">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Ticket">
+        <PropertyRef Name="UrgencyID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TicketAttachment_Ticket">
+    <End Role="Ticket" Type="Self.Ticket" Multiplicity="0..1" />
+    <End Role="TicketAttachment" Type="Self.TicketAttachment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Ticket">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TicketAttachment">
+        <PropertyRef Name="TicketID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_TicketHistory_Ticket">
+    <End Role="Ticket" Type="Self.Ticket" Multiplicity="1" />
+    <End Role="TicketHistory" Type="Self.TicketHistory" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Ticket">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="TicketHistory">
+        <PropertyRef Name="TicketID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="TmsCapstoneDBModelStoreContainer">
+    <EntitySet Name="BusinessRule" EntityType="Self.BusinessRule" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="BusinessRuleCondition" EntityType="Self.BusinessRuleCondition" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="BusinessRuleNotification" EntityType="Self.BusinessRuleNotification" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="BusinessRuleTrigger" EntityType="Self.BusinessRuleTrigger" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Department" EntityType="Self.Department" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Impact" EntityType="Self.Impact" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="KnowledgeBase" EntityType="Self.KnowledgeBase" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Priority" EntityType="Self.Priority" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="PriorityMatrixItem" EntityType="Self.PriorityMatrixItem" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Ticket" EntityType="Self.Ticket" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TicketAttachment" EntityType="Self.TicketAttachment" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TicketHistory" EntityType="Self.TicketHistory" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Urgency" EntityType="Self.Urgency" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_BusinessRuleCondition_BusinessRule" Association="Self.FK_BusinessRuleCondition_BusinessRule">
+      <End Role="BusinessRule" EntitySet="BusinessRule" />
+      <End Role="BusinessRuleCondition" EntitySet="BusinessRuleCondition" />
+    </AssociationSet>
+    <AssociationSet Name="FK_BusinessRuleCondition_BusinessRuleCondition" Association="Self.FK_BusinessRuleCondition_BusinessRuleCondition">
+      <End Role="BusinessRuleCondition" EntitySet="BusinessRuleCondition" />
+      <End Role="BusinessRuleCondition1" EntitySet="BusinessRuleCondition" />
+    </AssociationSet>
+    <AssociationSet Name="FK_BusinessRuleNotification_BusinessRule" Association="Self.FK_BusinessRuleNotification_BusinessRule">
+      <End Role="BusinessRule" EntitySet="BusinessRule" />
+      <End Role="BusinessRuleNotification" EntitySet="BusinessRuleNotification" />
+    </AssociationSet>
+    <AssociationSet Name="FK_BusinessRuleTrigger_BusinessRule" Association="Self.FK_BusinessRuleTrigger_BusinessRule">
+      <End Role="BusinessRule" EntitySet="BusinessRule" />
+      <End Role="BusinessRuleTrigger" EntitySet="BusinessRuleTrigger" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Category_Category" Association="Self.FK_Category_Category">
+      <End Role="Category" EntitySet="Category" />
+      <End Role="Category1" EntitySet="Category" />
+    </AssociationSet>
+    <AssociationSet Name="FK_KnowledgeBase_Category" Association="Self.FK_KnowledgeBase_Category">
+      <End Role="Category" EntitySet="Category" />
+      <End Role="KnowledgeBase" EntitySet="KnowledgeBase" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PriorityMatrixItem_Impact" Association="Self.FK_PriorityMatrixItem_Impact">
+      <End Role="Impact" EntitySet="Impact" />
+      <End Role="PriorityMatrixItem" EntitySet="PriorityMatrixItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PriorityMatrixItem_Priority" Association="Self.FK_PriorityMatrixItem_Priority">
+      <End Role="Priority" EntitySet="Priority" />
+      <End Role="PriorityMatrixItem" EntitySet="PriorityMatrixItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PriorityMatrixItem_Urgency1" Association="Self.FK_PriorityMatrixItem_Urgency1">
+      <End Role="Urgency" EntitySet="Urgency" />
+      <End Role="PriorityMatrixItem" EntitySet="PriorityMatrixItem" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ticket_Category" Association="Self.FK_Ticket_Category">
+      <End Role="Category" EntitySet="Category" />
+      <End Role="Ticket" EntitySet="Ticket" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ticket_Department" Association="Self.FK_Ticket_Department">
+      <End Role="Department" EntitySet="Department" />
+      <End Role="Ticket" EntitySet="Ticket" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ticket_Impact" Association="Self.FK_Ticket_Impact">
+      <End Role="Impact" EntitySet="Impact" />
+      <End Role="Ticket" EntitySet="Ticket" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ticket_Priority" Association="Self.FK_Ticket_Priority">
+      <End Role="Priority" EntitySet="Priority" />
+      <End Role="Ticket" EntitySet="Ticket" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Ticket_Urgency" Association="Self.FK_Ticket_Urgency">
+      <End Role="Urgency" EntitySet="Urgency" />
+      <End Role="Ticket" EntitySet="Ticket" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TicketAttachment_Ticket" Association="Self.FK_TicketAttachment_Ticket">
+      <End Role="Ticket" EntitySet="Ticket" />
+      <End Role="TicketAttachment" EntitySet="TicketAttachment" />
+    </AssociationSet>
+    <AssociationSet Name="FK_TicketHistory_Ticket" Association="Self.FK_TicketHistory_Ticket">
+      <End Role="Ticket" EntitySet="Ticket" />
+      <End Role="TicketHistory" EntitySet="TicketHistory" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
